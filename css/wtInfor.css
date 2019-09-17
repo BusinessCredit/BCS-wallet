@@ -1,0 +1,73 @@
+.wInforWrapper{
+    min-height:100vh;
+    background-color:#f9f9f9;
+}
+.wInforWrapper .unContent{
+    padding-bottom:0.2rem;
+}
+.wInforWrapper .wInforTitle{
+    padding:0.2rem;
+    background-color:white;
+    margin-bottom:0.2rem;
+}
+.wInforWrapper .wInforTitle img{
+    width:1.2rem;
+    height:1.2rem;
+    display: block;
+    margin:0.4rem auto;
+    margin-bottom:0.2rem;
+}
+.wInforWrapper .wInforTitle h2{
+    font-size:0.48rem;
+    color:#f74e49;
+    text-align: center;
+}
+.wInforWrapper .wInforTitle p{
+    text-align: center;
+    color:#aab8cd;
+
+}
+.wInforWrapper .contentList ul{
+
+}
+.wInforWrapper .contentList ul li{
+    padding:0.3rem 0.2rem;
+    background-color:white;
+    margin-bottom:0.2rem;
+}
+.wInforWrapper .contentList ul li p{
+    margin:0 0.2rem;
+}
+.wInforWrapper .contentList ul li:last-child{
+    border:none;
+}
+.wInforWrapper .contentList ul li .right-ico{
+    width:0.16rem;
+    height:0.29rem;
+    background:url(../img/right-ico.png) no-repeat center;
+    background-size:100%;
+}
+.wInforWrapper .contentList ul li img{
+    width:0.32rem;
+    height:0.32rem;
+}
+.wInforWrapper .contentList .btn-ui{
+    width:7.1rem;
+    height:1rem;
+    line-height:1rem;
+    text-align: center;
+    border-radius: 5px;
+    display: block;
+    margin:0 auto;
+}
+.wInforWrapper .contentList .btn-b-1{
+    background-color:#4c90c6;
+    color:white;
+    margin-top:1rem;
+    text-align: center;
+}
+.wInforWrapper .contentList .btn-b-2{
+    border:1px solid #c1c8d6;
+    color:black;
+    margin-top:0.4rem;
+}

@@ -1,0 +1,53 @@
+.meWrapper{
+    font-size:0.28rem;
+    background-color:#f9f9f9;
+    min-height:100vh;
+}
+.meWrapper .l-header{
+    overflow: hidden;
+    padding:0.3rem 0.2rem;
+    background-color:white;
+}
+.meWrapper .l-header img{
+    width:7.1rem;
+    height:1.28rem;
+}
+.meWrapper .contentList{
+    /*padding:0.2rem;*/
+}
+.meWrapper .contentList ul{
+
+}
+.meWrapper .contentList ul li{
+    padding:0.3rem 0.2rem;
+    background-color:white;
+    margin-bottom:0.2rem;
+}
+.meWrapper .contentList ul li p{
+    margin:0 0.2rem;
+    color:black;
+}
+.meWrapper .contentList ul li .nums{
+    min-width:0.7rem;
+    color:white;
+    height:0.35rem;
+    line-height:0.35rem;
+    background-color:red;
+    text-align: center;
+    border-radius: 5px;
+    margin:0 0.2rem;
+    font-size:0.22rem;
+}
+.meWrapper .contentList ul li:last-child{
+    border:none;
+}
+.meWrapper .contentList ul li .right-ico{
+    width:0.16rem;
+    height:0.29rem;
+    background:url(../img/right-ico.png) no-repeat center;
+    background-size:100%;
+}
+.meWrapper .contentList ul li img{
+    width:0.35rem;
+    height:0.35rem;
+}

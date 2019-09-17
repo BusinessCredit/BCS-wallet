@@ -1,0 +1,45 @@
+.foundWrapper{
+    line-height:1.6;
+    font-size:28px;
+}
+.foundContent{
+    width:7.5rem;
+    height:100vh;
+    overflow: hidden;
+    background:url(../img/found-bg.png) no-repeat center;
+    background-size:cover;
+    box-sizing: border-box;
+}
+.foundContent .content .logo-ico-1{
+    width:1.86rem;
+    height:1.86rem;
+    border-radius: 50%;
+    margin:0 auto;
+    display: block;
+    margin-top:1.25rem;
+}
+.found-one{
+    font-size:0.34rem;
+    color:#c1c8d6;
+    text-align: center;
+    margin-top:0.2rem;
+}
+.btn-ui{
+    width:6.5rem;
+    height:1rem;
+    margin:0 auto;
+    text-align: center;
+    display: block;
+    font-size:0.32rem;
+    color:white;
+    line-height:1rem;
+    border-radius: 5px;
+}
+.found-btn-1{
+    margin-top:2.75rem;
+    background-color:#4c90c6;
+}
+.found-btn-2{
+    margin-top:0.5rem;
+    border:1px solid white;
+}

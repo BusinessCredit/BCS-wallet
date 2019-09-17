@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="../skin/css/mui.min.css">
+    <link rel="stylesheet" href="./css/unified.css">
+    <link rel="stylesheet" href="./css/walletCurr.css">
+    <link rel="stylesheet" href="./css/wtInfor.css">
+    <script src="../skin/js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../dapp/js/rem.js"></script>
+    <script src="../skin/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../skin/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../skin/js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>钱包</title>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="wInforWrapper" id="app">
+    <header class="flex-box header">
+        <img src="../dapp/img/back_black.png" class="mui-action-back">
+        <div class="box-1 text">BCS钱包</div>
+        <span>保存</span>
+    </header>
+    <div class="unContent">
+        <div class="wInforTitle">
+            <img src="./img/lb-ico-3.png" alt="">
+            <h2> 500.89 BCS </h2>
+            <p>
+                0x2088668EC...1b0B91c6Fa
+            </p>
+        </div>
+        <div class="contentList">
+            <ul>
+                <li class="flex-box">
+                    <img src="./img/w-i-ico1.png" alt="">
+                    <p class="box-1">钱包名称</p>
+                    <i class="right-ico"></i>
+                </li>
+                <li class="flex-box">
+                    <img src="./img/w-i-ico2.png" alt="">
+                    <p class="box-1">修改密码</p>
+                    <i class="right-ico"></i>
+                </li>
+                <li class="flex-box">
+                    <img src="./img/w-i-ico3.png" alt="">
+                    <p class="box-1">导出私钥</p>
+                    <i class="right-ico"></i>
+                </li>
+                <li class="flex-box">
+                    <img src="./img/w-i-ico4.png" alt="">
+                    <p class="box-1">导出keystore</p>
+                    <i class="right-ico"></i>
+                </li>
+            </ul>
+            <div class="btnBox">
+                <a class="btn-ui btn-b-1">备份助记词</a>
+                <a class="btn-ui btn-b-2">删除钱包</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+		<title>扫描二维码页面</title>
+		<style type="text/css">
+			body {
+				margin: 0;
+			}
+			
+			.box>.content {
+				width: 100%;
+				height: 100vh;
+			}
+			
+			.box>.content>.CodeCanvas {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="app">
+			<div class="box">
+				<div class="content">
+					<div class="CodeCanvas" id="bcid"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script type="text/javascript">
+	mui.plusReady(function() {
+		vm.scanresult = mui.preload({
+			url: 'scanresult.html',
+			id: 'scanresult',
+			styles: {
+				"render": "always", //一直渲染  
+				"popGesture": "none"
+			}
+		});
+	});
+	var vm = new Vue({
+		el: '#app',
+		data: {
+			pageW: 0,
+			scanresult: '',
+			headerHtml: [{
+				tag: 'img',
+				id: 'icon_back',
+				src: 'img/icon/back_white.png',
+				position: {
+					top: '35px',
+					left: '20px',
+					width: '25px',
+					height: '25px'
+				}
+			}, {
+				tag: 'font',
+				id: 'title',
+				text: '扫一扫',
+				textStyles: {
+					color: '#ffffff',
+					size: '18px'
+				}
+			}, {
+				tag: 'font',
+				id: 'album',
+				text: '相册',
+				position: {
+					width: '95%'
+				},
+				textStyles: {
+					align: 'right',
+					color: '#ffffff',
+					size: '18px'
+				}
+			}],
+			noticeTxt: [{
+				tag: 'font',
+				id: 'notice1',
+				text: '将二维码/条形码放入框内，即可自动扫描',
+				textStyles: {
+					color: '#ffffff',
+					size: '15px'
+				}
+			}],
+			noticeObj: '',
+			headerObj: '',
+			scanObj: ''
+		},
+		mounted: function() {
+			this.pageW = window.innerWidth;
+			this.drawHeader();
+		},
+		methods: {
+			drawHeader: function() {
+				var self = this;
+				mui.plusReady(function() {
+					self.startRecognize();
+					var curr = plus.webview.currentWebview();
+					curr.setStyle({
+						'popGesture': 'none'
+					});
+					curr.addEventListener('show', function() {
+						plus.navigator.setStatusBarStyle('light');
+					});
+					curr.addEventListener('close', function(e) {
+						self.headerObj.close();
+						self.noticeObj.close();
+						plus.navigator.setStatusBarStyle('dark');
+					});
+					self.headerObj = new plus.nativeObj.View('header', {
+						top: '0px',
+						right: '0px',
+						height: '100px',
+						width: '100%'
+					}, self.headerHtml);
+					self.noticeObj = new plus.nativeObj.View('notice', {
+						bottom: '120px',
+						right: '0px',
+						height: '100px',
+						width: '100%'
+					}, self.noticeTxt);
+					setTimeout(function() {
+						self.headerObj.show();
+						self.noticeObj.show();
+					}, 200);
+					self.headerObj.addEventListener('click', function(event) {
+						var clientX = event.clientX;
+						var clientY = event.clientY;
+						if(clientX > 0 && clientX <= parseInt(self.pageW * 0.1)) {
+							mui.back();
+						} else if(clientX > self.pageW * 0.80 && clientX <= parseInt(self.pageW)) {
+							self.scanPicture();
+						}
+					});
+				});
+			},
+			showNativeView: function() {
+				this.headerObj.show();
+				this.noticeObj.show();
+			},
+			//开始扫描
+			startRecognize: function() {
+				var self = this;
+				try {
+					var filter;
+					//自定义的扫描控件样式
+					var styles = {
+						frameColor: "#29E52C",
+						scanbarColor: "#29E52C",
+						background: ""
+					}
+					//扫描控件构造
+					self.scanObj = new plus.barcode.Barcode('bcid', filter, styles);
+					self.scanObj.onmarked = self.onmarked;
+					self.scanObj.onerror = self.onerror;
+					self.scanObj.start();
+				} catch(e) {
+					console.log("出现错误啦:\n" + e);
+				}
+			},
+			//成功回调
+			onmarked: function(type, result) {
+				var self = this;
+				if(type == plus.barcode.QR) {
+					var reg = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-\?#_\.~\/])+$/;
+					if(reg.test(result)) {
+						var token = getItem("Userdata").token;
+						if(!token) {
+							restartApp();
+						}
+						var url = UpdateUrlParameter(result, 'token', encodeURIComponent(token));
+						plus.runtime.openURL(url, function() {
+							mui.alert("启动外部浏览器失败");
+							return;
+						});
+						return;
+					} else {
+						self.showresult(result);
+					}
+				} else if(type == plus.barcode.EAN13) {
+					self.showresult(result);
+				} else if(type == plus.barcode.EAN8) {
+					self.showresult(result);
+				}
+				self.scanObj.close();
+				setTimeout(self.startRecognize, 1000);
+			},
+			showresult: function(result) {
+				var self = this;
+				mui.fire(self.scanresult, 'initMethod', {
+					result: result
+				});
+				setTimeout(function() {
+					self.headerObj.hide();
+					self.noticeObj.hide();
+					plus.navigator.setStatusBarStyle('dark');
+					self.scanresult.show("slide-in-right", 300);;
+				}, 150);
+			},
+			//失败回调
+			onerror: function(e) {
+				console.log(e);
+			},
+			// 从相册中选择二维码图片 
+			scanPicture: function() {
+				var self = this;
+				plus.gallery.pick(function(path) {
+					plus.barcode.scan(path, self.onmarked, function(error) {
+						plus.nativeUI.alert("无法识别此图片");
+					});
+				}, function(err) {
+					console.log("Failed: " + err.message);
+				});
+			}
+		}
+	});
+</script>

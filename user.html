@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/me.css">
+    <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>我的</title>
+</head>
+<body>
+<div class="meWrapper footerWrapper" id="app">
+    <header class="flex-box header otherHeader">
+    	<span class="seize"></span>
+        <div class="box-1 text">我的</div>
+        <span class="seize text-right"></span>
+    </header>
+    <div class="unContent meContent">
+        <div class="l-header">
+            <img src="img/trade-t-bg.png">
+        </div>
+        <div class="content">
+            <div class="contentList">
+                <ul>
+                    <li class="flex-box"  @tap="show('news')">
+                        <img src="img/me-l-ico1.png">
+                        <p class="box-1">消息中心</p>
+                        <span class="nums">20</span>
+                        <i class="right-ico"></i>
+                    </li>
+                    <li class="flex-box" @tap="show('setting')">
+                        <img src="img/me-l-ico2.png">
+                        <p class="box-1">用户信息</p>
+                        <i class="right-ico"></i>
+                    </li>
+                    <li class="flex-box" @tap="show('help')">
+                        <img src="img/me-l-ico3.png">
+                        <p class="box-1">帮助中心</p>
+                        <i class="right-ico"></i>
+                    </li>
+                     <li class="flex-box" @tap="show('about')">
+                        <img src="img/me-l-ico3.png">
+                        <p class="box-1">关于我们</p>
+                        <i class="right-ico"></i>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            isOtherList: false
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>

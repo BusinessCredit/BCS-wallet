@@ -1,0 +1,36 @@
+.centerWrapper .content ul{
+    padding:0 0.2rem;
+}
+.centerWrapper .unContent{
+    padding-bottom:1.6rem;
+    min-height:100vh;
+}
+.centerWrapper .content ul li{
+    justify-content: space-between;
+    padding:0.2rem 0;
+    border-bottom:1px solid #eee;
+    min-height:1rem;
+}
+.centerWrapper .content ul li img{
+    width:0.7rem;
+    height:0.7rem;
+}
+.centerWrapper .content ul li p{
+    color:#4c90c6;
+    margin-left:1rem;
+    text-align: left;
+}
+.centerWrapper .btn-ui{
+    display: block;
+    height: 1rem;
+    line-height: 1rem;
+    text-align: center;
+    border-radius: 5px;
+    margin-top: 1rem;
+    background-color: #4c90c6;
+    color: white;
+    position:absolute;
+    bottom:0.4rem;
+    left:0.2rem;
+    width:7.1rem;
+}

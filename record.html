@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="../skin/css/mui.min.css">
+    <link rel="stylesheet" href="./css/unified.css">
+    <link rel="stylesheet" href="./css/walletCurr.css">
+    <script src="../skin/js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../dapp/js/rem.js"></script>
+    <script src="../skin/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../skin/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../skin/js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>钱包</title>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="setEalletWrapper assetsWrapper importWrapper recordWrapper" id="app">
+    <header class="flex-box header">
+        <img src="../dapp/img/back_black.png" class="mui-action-back">
+        <div class="box-1 text">交易记录</div>
+        <span class="seize"></span>
+    </header>
+    <div class="unContent">
+        <div class="mui-content">
+            <div class="importTitle">
+                <div id="segmentedControl" class="mui-segmented-control mui-segmented-control-primary mui-segmented-control-negative">
+                    <a class="mui-control-item mui-active" href="#item1">全部</a>
+                    <a class="mui-control-item" href="#item2">转出</a>
+                    <a class="mui-control-item" href="#item3">转入</a>
+                    <a class="mui-control-item" href="#item4">失败</a>
+                </div>
+            </div>
+            <div>
+                <div id="item1" class="mui-control-content mui-active">
+                    <div class="content">
+                        <h1 class="title">2019.08</h1>
+                        <ul>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="content">
+                        <h1 class="title">2019.08</h1>
+                        <ul>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="item2" class="mui-control-content">
+                    <div class="content">
+                        <h1 class="title">2019.08</h1>
+                        <ul>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="item3" class="mui-control-content">
+                    <div class="content">
+                        <h1 class="title">2019.08</h1>
+                        <ul>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="item4" class="mui-control-content">
+                    <div class="content">
+                        <h1 class="title">2019.08</h1>
+                        <ul>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico1.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor plus-c">-507.00 BCS</div>
+                            </li>
+                            <li class="flex-box">
+                                <img src="./img/s-a-ico2.png" alt="">
+                                <div class="c-infor box-1">
+                                    <h6>0xff333...6e83839</h6>
+                                    <p>2019.09.07 10:00</p>
+                                </div>
+                                <div class="r-infor reduce-c">-507.00 BCS</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            word: '',//助记词
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>

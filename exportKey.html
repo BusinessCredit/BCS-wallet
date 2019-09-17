@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="../skin/css/mui.min.css">
+    <link rel="stylesheet" href="./css/unified.css">
+    <link rel="stylesheet" href="./css/walletCurr.css">
+    <script src="../skin/js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../dapp/js/rem.js"></script>
+    <script src="../skin/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../skin/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../skin/js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>钱包</title>
+    <style>
+        .tipsContent{
+            position:relative;
+            top:50%;
+            left:50%;
+            transform: translate(-50%,-50%);
+            width:6.9rem;
+            height:4.7rem;
+            background-color:white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .tipsContent img{
+            width:0.68rem;
+            height:0.84rem;
+            margin-top:0.5rem;
+        }
+        .tipsContent h4{
+            line-height:2;
+            font-size:0.32rem;
+            margin-bottom:0.2rem;
+        }
+        .tipsContent p{
+            text-align: left;
+            padding:0.2rem 0.3rem;
+        }
+        .tipsContent .k-btn-ui{
+            height:0.9rem;
+            line-height:0.9rem;
+            text-align: center;
+            color:white;
+            width:100%;
+            background-color:#f74742;
+            display: block;
+            position:absolute;
+            bottom:0;
+            left:0;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="setEalletWrapper importWrapper exportWrapper" id="app">
+    <header class="flex-box header">
+        <img src="../dapp/img/back_black.png" class="mui-action-back">
+        <div class="box-1 text">导出私钥</div>
+        <span class="seize"></span>
+    </header>
+    <div class="unContent">
+        <!--提示-->
+        <div class="tipsMask mask" v-if="tips">
+            <div class="tipsContent">
+                <img src="./img/sn-ico.png" alt="">
+                <h4>请勿截图</h4>
+                <p>请确保四周无人及无任何摄像头！勿用截图或拍照的方式保存私钥或对应的二维码。</p>
+                <a class="k-btn-ui" @tap="tips=false">知道了</a>
+            </div>
+        </div>
+        <div class="mui-content">
+            <div class="importTitle">
+                <div id="segmentedControl" class="mui-segmented-control mui-segmented-control-primary mui-segmented-control-negative">
+                    <a class="mui-control-item mui-active" href="#item1">私钥</a>
+                    <a class="mui-control-item" href="#item2">二维码</a>
+                </div>
+            </div>
+            <div>
+                <div id="item1" class="mui-control-content mui-active">
+                    <div class="content">
+                        <ul>
+                            <li>
+                                <h6>离线保存</h6>
+                                <p>切勿保存至邮箱、记事本、网盘、聊天工具等，非常危险</p>
+                            </li>
+                            <li>
+                                <h6>请勿使用网络传输</h6>
+                                <p>请勿通过网络工具传输，一旦被黑客获取将造成不可挽回
+                                    的资产损失，建议离线设备通过二维码方式传输。</p>
+                            </li>
+                            <li>
+                                <h6>密码管理工具保存</h6>
+                                <p>建议使用密码工具管理</p>
+                            </li>
+                            <li class="flex-box">
+                                <textarea rows="5" v-model="word" readonly placeholder="输入助记词，用空格分隔"></textarea>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="swBtn">
+                        <a class="btn-ui sw-btn-1">复制私钥</a>
+                    </div>
+                </div>
+                <div id="item2" class="mui-control-content">
+                    <div class="content">
+                        <ul>
+                            <li>
+                                <h6>仅供直接扫描</h6>
+                                <p>二维码禁止保存、截图、以及拍照。仅供用户在安全环境
+                                    下直接扫描来方便的导入钱包。</p>
+                            </li>
+                            <li>
+                                <h6>在安全环境下使用</h6>
+                                <p>请在确保四周无人及无摄像头的情况下使用，二维码一旦
+                                    被他人获取将造成不可挽回的资产损失。</p>
+                            </li>
+                        </ul>
+                        <div class="ewmBox">
+                            <img src="./img/ewm-2.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            tips: true,
+            word: '0x2088668EC11221F5687a7568AAFab291b0B9\n' +
+            '1c6Fa0',//助记词
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>

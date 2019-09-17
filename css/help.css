@@ -1,0 +1,35 @@
+.helpWrapper .helpTitle{
+    padding:0.3rem;
+    text-align: center;
+    position:relative;
+    height:1.7rem;
+    background-color:#2e3a6a;
+    color:white;
+}
+.helpWrapper .helpTitle input{
+    width:7.1rem;
+    left:0.2rem;
+    height:0.5rem;
+    line-height:0.5rem;
+    padding:0 0.2rem 0 0.7rem;
+    background:url(../img/search-ico.png) no-repeat 0.2rem center #586188;
+    background-size:0.28rem 0.24rem;
+    position:absolute;
+    bottom:0.2rem;
+    border-radius: 0.25rem;
+    margin:0;
+    color:white;
+}
+.helpWrapper .helpTitle input::-webkit-input-placeholder{
+    color:#eeeeee;
+}
+.helpWrapper .content{
+    padding:0.2rem;
+}
+.helpWrapper .content h1{
+    font-size:0.32rem;
+    margin-top:0.2rem;
+}
+.helpWrapper .content ul li{
+    padding-top:0.2rem;
+}

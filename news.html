@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/mui.min.css">
+	<link rel="stylesheet" href="css/unified.css">
+	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="css/name.css">
+	<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/rem.js"></script>
+	<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>消息中心</title>
+</head>
+<body>
+<div class="newsWrapper" id="app">
+    <header class="flex-box header">
+        <img src="img/icon/back_black.png" class="mui-action-back">
+        <div class="box-1 text">消息中心</div>
+        <span class="">全部已读</span>
+    </header>
+    <div class="unContent">
+        <div class="content">
+            <ul>
+                <li>
+                    <div class="infor flex-box">
+                        <span class="box-1 media_title">BCS钱包升级提醒BCS钱包升级提醒BCS钱包升级提醒</span>
+                        <b>2019/08/05 11:55</b>
+                    </div>
+                    <p>BCS钱包最新版本1.1优化了BCS代币转账速度,BCS钱包最...</p>
+                </li>
+                <li>
+                    <div class="infor flex-box">
+                        <span class="box-1 media_title">BCS钱包升级提醒BCS钱包升级提醒BCS钱包升级提醒</span>
+                        <b>2019/08/05 11:55</b>
+                    </div>
+                    <p>BCS钱包最新版本1.1优化了BCS代币转账速度1优化了BCS代币转账速度1优化了BCS代币转账速度,BCS钱包最...</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            isOtherList: false
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>

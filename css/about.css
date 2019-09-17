@@ -1,0 +1,23 @@
+.centerWrapper .aboutTitle{
+    padding:0.2rem;
+    text-align: center;
+}
+.centerWrapper .aboutTitle img{
+    width:1.2rem;
+    height:1.2rem;
+    margin:0.5rem auto;
+    display: block;
+    margin-bottom:0.2rem;
+}
+.centerWrapper .aboutTitle p{
+    padding:0.2rem 0.5rem;
+    text-align: left;
+}
+.centerWrapper .content ul li{
+    justify-content: space-between;
+    padding:0.2rem;
+}
+.centerWrapper .content ul li img{
+    width:0.16rem;
+    height:0.29rem;
+}

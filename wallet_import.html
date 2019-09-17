@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/walletCurr.css">
+    <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+    <title>导入钱包</title>
+</head>
+<body>
+<div class="setEalletWrapper importWrapper" id="app">
+    <header class="flex-box header">
+        <img src="img/icon/back_black.png" class="mui-action-back">
+        <div class="box-1 text">导入钱包</div>
+        <img src="img/other-l-ico1.png" @tap="show('scan_code')">
+    </header>
+    <div class="unContent">
+        <div class="mui-content">
+            <div class="importTitle">
+                <div id="segmentedControl" class="mui-segmented-control mui-segmented-control-primary mui-segmented-control-negative">
+                    <a class="mui-control-item mui-active" href="#item1">助记词</a>
+                    <a class="mui-control-item" href="#item2">官方钱包</a>
+                    <a class="mui-control-item" href="#item3">私钥</a>
+                    <a class="mui-control-item" href="#item4">观察</a>
+                </div>
+            </div>
+            <div>
+                <div id="item1" class="mui-control-content mui-active">
+                    <div class="content">
+                        <ul>
+                            <li class="flex-box">
+                                <textarea rows="5" v-model="word" placeholder="输入助记词，用空格分隔"></textarea>
+                            </li>
+                            <li class="flex-box">
+                                <span>路径　　</span>
+                                <select name="" class="box-1" id="select">
+                                    <option value="1">m/44’/60’/0’/0’/0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </li>
+                            <li class="flex-box">
+                                <span>钱包名称</span>
+                                <input class="box-1" type="text" placeholder="请创建钱包名称">
+                            </li>
+                            <li class="flex-box">
+                                <span>设置密码</span>
+                                <input class="box-1" type="text" placeholder="请设置密码">
+                            </li>
+                            <li class="flex-box">
+                                <span>重复密码</span>
+                                <input class="box-1" type="text" placeholder="请再次输入密码">
+                            </li>
+                            <li class="flex-box">
+                                <span>密码提示</span>
+                                <input class="box-1" type="text" placeholder="请输入密码提示">
+                            </li>
+                        </ul>
+                        <div class="mui-input-row mui-radio mui-left">
+                            <label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
+                            <input name="radio1" type="radio">
+                        </div>
+                    </div>
+                </div>
+                <div id="item2" class="mui-control-content">
+                    <div class="content">
+                        <ul>
+                            <li>
+                                <p class="item2-desc">直接复制粘贴**官方钱包keystore文件内容至输入框，
+                                    或者通过生成keystore内容的二维码，扫描录入。</p>
+                                <textarea rows="5" v-model="word" placeholder="输入助记词，用空格分隔"></textarea>
+                            </li>
+                            <li class="flex-box">
+                                <span>keystore密码</span>
+                                <input class="box-1" type="text" placeholder="请输入keystore密码">
+                            </li>
+                        </ul>
+                        <div class="mui-input-row mui-radio mui-left">
+                            <label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
+                            <input name="radio1" type="radio">
+                        </div>
+                    </div>
+                </div>
+                <div id="item3" class="mui-control-content">
+                    <div class="content">
+                        <ul>
+                            <li class="flex-box">
+                                <textarea rows="5" v-model="word" placeholder="输入助记词，用空格分隔"></textarea>
+                            </li>
+                            <li class="flex-box">
+                                <span>设置密码</span>
+                                <input class="box-1" type="text" placeholder="请设置密码">
+                            </li>
+                            <li class="flex-box">
+                                <span>重复密码</span>
+                                <input class="box-1" type="text" placeholder="请再次输入密码">
+                            </li>
+                            <li class="flex-box">
+                                <span>密码提示</span>
+                                <input class="box-1" type="text" placeholder="请输入密码提示">
+                            </li>
+                        </ul>
+                        <div class="mui-input-row mui-radio mui-left">
+                            <label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
+                            <input name="radio1" type="radio">
+                        </div>
+                    </div>
+                </div>
+                <div id="item4" class="mui-control-content">
+                    <div class="content">
+                        <ul>
+                            <li>
+                                <p class="item2-desc">观察钱包不需要导入私钥，只导入钱包地址，进行日常
+                                    查看账户，交易和接受通知。大额资金的私钥建议使用
+                                    冷钱包或硬件钱包管理，避免泄漏被盗。</p>
+                            </li>
+                            <li class="flex-box">
+                                <span>钱包地址</span>
+                                <input class="box-1" type="text" placeholder="扫码或输入钱包地址">
+                            </li>
+                        </ul>
+                        <div class="item4-desc">
+                            注意：观察钱包发送交易时需要冷钱包配合签名。你
+                            可以使用另一台闲置手机，开飞行模式作为冷钱包，
+                            导入钱包私钥，配合离线签名。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="swBtn">
+            <a class="btn-ui sw-btn-1">开始导入</a>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            word: '',//助记词
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>
