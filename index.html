@@ -83,25 +83,7 @@
             isOtherList: false
         },
         methods: {
-            //获取默认数据
-            getData(){
-                var self = this
-                this.list = []
-                $.ajax({
-                    type: "get",
-                    url: '',
-                    beforeSend: function(xhr) {
-                        token = getItem("Userdata").token;
-                        xhr.setRequestHeader("Authorization", "Basic " + token);
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function(data) {
-                        console.log('系统繁忙!');
-                    }
-                });
-            },
+           
         },
         mounted(){
 
