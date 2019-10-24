@@ -1,75 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
-	<link rel="stylesheet" href="css/mui.min.css">
-	<link rel="stylesheet" href="css/unified.css">
-	<link rel="stylesheet" href="css/index.css">
-	<link rel="stylesheet" href="css/center.css">
-	<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/rem.js"></script>
-	<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-    <title>用户信息</title>
-</head>
-<body>
-<div class="centerWrapper" id="app">
-    <header class="flex-box header">
-        <img src="img/icon/back_black.png" class="mui-action-back">
-        <div class="box-1 text">用户信息</div>
-        <span class="seize"></span>
-    </header>
-    <div class="unContent">
-        <div class="content">
-            <ul>
-                <li class="flex-box"><span>头像</span> <img src="./img/lb-ico-2.png" alt=""></li>
-                <li class="flex-box">
-                    <span>钱包名称</span>
-                    <p class="">BCS钱包</p>
-                </li>
-                <li class="flex-box">
-                    <span>钱包名称</span>
-                    <p class="box-1">im14x5Dtxyciwehuqhfueqhfuqdwuhqiddwfdq</p>
-                </li>
-            </ul>
-        </div>
-        <a class="btn-ui">复制收款地址</a>
-    </div>
-</div>
-</body>
-<script>
-    var vm = new Vue({
-        el: '#app',
-        data: {
-            isOtherList: false
-        },
-        methods: {
-            //获取默认数据
-            getData(){
-                var self = this
-                this.list = []
-                $.ajax({
-                    type: "get",
-                    url: '',
-                    beforeSend: function(xhr) {
-                        token = getItem("Userdata").token;
-                        xhr.setRequestHeader("Authorization", "Basic " + token);
-                    },
-                    success: function(data) {
 
-                    },
-                    error: function(data) {
-                        console.log('系统繁忙!');
-                    }
-                });
-            },
-        },
-        mounted(){
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/unified.css">
+		<link rel="stylesheet" href="css/index.css">
+		<link rel="stylesheet" href="css/center.css">
+		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/rem.js"></script>
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+		<title>用户信息</title>
+	</head>
 
-        }
-    })
-</script>
+	<body>
+		<div class="centerWrapper" id="app">
+			<header class="flex-box header">
+				<img src="img/icon/back_black.png" class="mui-action-back">
+				<div class="box-1 text">身份信息</div>
+				<span class="seize"></span>
+			</header>
+			<div class="unContent">
+				<div class="content">
+					<ul>
+						<li class="flex-box"><span>头像</span> <img @tap='changeHead' :src="userInfo.headImg" class="headimg"></li>
+						<li class="flex-box">
+							<span>钱包名称</span>
+							<p @tap='changeWalletName'>{{userInfo.walletName}}</p>
+						</li>
+						<li class="flex-box">
+							<span>钱包地址</span>
+							<p class="box-1">{{walletAddress}}<img class="copy" src="img/icon/copy.png" @tap='copy(walletAddress)'/></p>
+						</li>
+					</ul>
+				</div>
+				<a class="btn-ui" @tap='logout'>退出当前身份</a>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var immersed = getImmersedHeight();
+		$(".header").css('padding-top', (immersed + 5) + 'px');
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				userInfo: {},
+				walletAddress: ''
+			},
+			methods: {
+				changeHead: function() {
+					if(!mui.os.plus) {
+						return;
+					}
+					var _self = this;
+					var a = [{
+						title: "拍照"
+					}, {
+						title: "从手机相册选择"
+					}];
+					plus.nativeUI.actionSheet({
+						title: "修改头像",
+						cancel: "取消",
+						buttons: a
+					}, function(b) {
+						switch(b.index) {
+							case 0:
+								break;
+							case 1:
+								_self.getImage();
+								break;
+							case 2:
+								_self.galleryImg();
+								break;
+							default:
+								break;
+						}
+					});
+				},
+				changeWalletName: function() {
+					var _self = this;
+					plus.nativeUI.prompt('钱包名称', function(e) {
+						if(e.index==0){
+							_self.userInfo.walletName = e.value;
+							setItem('userInfo',_self.userInfo);
+						}
+					})
+				},
+				logout: function() {
+					restartApp();
+				},
+				getImage: function() {
+					var _self = this;
+					var c = plus.camera.getCamera();
+					c.captureImage(function(e) {
+						plus.io.resolveLocalFileSystemURL(e, function(entry) {
+							var s = entry.toLocalURL() + "?version=" + new Date().getTime();
+							_self.userInfo.headImg = s;
+							setItem('userInfo',_self.userInfo);
+						}, function(e) {
+							console.log("读取拍照文件错误：" + e.message);
+						});
+					}, function(s) {
+						console.log("error" + s);
+					}, {
+						filename: "_doc/head.jpg"
+					})
+				},
+				galleryImg: function() {
+					var _self = this;
+					plus.gallery.pick(function(a) {
+						plus.io.resolveLocalFileSystemURL(a, function(entry) {
+							plus.io.resolveLocalFileSystemURL("_doc/", function(root) {
+								root.getFile("head.jpg", {}, function(file) {
+									//文件已存在
+									file.remove(function() {
+										entry.copyTo(root, 'head.jpg', function(e) {
+												var e = e.fullPath;
+												_self.userInfo.headImg = e;
+												setItem('userInfo',_self.userInfo);
+											},
+											function(e) {
+												console.log('copy image fail:' + e.message);
+											});
+									}, function() {
+										console.log("delete image fail:" + e.message);
+									});
+								}, function() {
+									//文件不存在
+									entry.copyTo(root, 'head.jpg', function(e) {
+											var path = e.fullPath;
+											_self.userInfo.headImg = path;
+											setItem('userInfo',_self.userInfo);
+										},
+										function(e) {
+											console.log('copy image fail:' + e.message);
+										});
+								});
+							}, function(e) {
+								console.log("get _www folder fail");
+							})
+						}, function(e) {
+							console.log("读取拍照文件错误：" + e.message);
+						});
+					}, function(a) {}, {
+						filter: "image"
+					})
+				}
+			},
+			mounted: function() {
+				this.userInfo = getItem('userInfo');
+				this.walletAddress = getItem('walletInfo').walletAddress;
+			}
+		})
+	</script>
+
 </html>

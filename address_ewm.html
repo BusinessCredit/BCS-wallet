@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/name.css">
+     <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/qrcode.min.js" type="text/javascript" charset="utf-8"></script>
+    <title>收款码</title>
+</head>
+<body>
+<div class="skCodeWrapper" id="app">
+    <header class="flex-box header">
+        <img src="img/icon/back_black.png" class="mui-action-back">
+        <div class="box-1 text">收款码</div>
+         <img src="img/icon/send.png">
+    </header>
+    <div class="unContent">
+        <div class="skBg-title"></div>
+        <div class="content">
+            <img class="img-title" src="img/logo-ico-1.png">
+            <p class="desc">{{walletAddress}}</p>
+            <div class="ewmCode" id='qrcode'></div>
+            <a class="btn-ui" @tap="copy(walletAddress)">复制收款地址</a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+	var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            walletAddress: ''
+        },
+        mounted:function(){
+        	var walletinfo = getItem('walletInfo');
+        	this.walletAddress = walletinfo.walletAddress;
+        	var qrcode = new QRCode(document.getElementById("qrcode"), {
+				width : 480,
+				height : 480
+			});
+			qrcode.makeCode(this.walletAddress)
+        }
+    })
+</script>
+</html>

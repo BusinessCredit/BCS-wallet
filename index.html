@@ -12,18 +12,25 @@
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/util.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
     <title>钱包</title>
     <script type="text/javascript">
 		mui.plusReady(function() {
+			//底部菜单
 			BottomMenu();
-			if(!getItem("Userdata")) {
+			//检测更新
+			update_check();
+			//状态
+			var walletInfo = getItem("walletInfo");
+			if(!getItem("walletInfo")) {
 				var all = plus.webview.all();
-				show('init');
 				for(var i = 0; i < all.length; i++) {
 					all[i].hide();
 				};
-				return;
+				show('init');
 			}else{
+				vm.initData();
 				plus.navigator.closeSplashscreen();
 			}
 		});
@@ -33,41 +40,31 @@
 <div class="indexWrapper footerWrapper" id="app">
     <div class="otherMask mask" @tap="isOtherList=false" v-if="isOtherList"></div>
     <header class="flex-box header otherHeader">
-        <img src="img/lb-ico-1.png" @tap="isOtherList=!isOtherList" class="mui-action-1">
-        <div class="box-1 text">钱包</div>
-        <img src="img/lb-ico-2.png" class="mui-action-2">
-        <div class="otherList" v-show="isOtherList">
-            <ul>
-                <li class="flex-box">
-                    <img src="img/other-l-ico1.png" alt=""> 扫一扫
-                </li>
-                <li class="flex-box">
-                    <img src="img/other-l-ico2.png" alt=""> 创建钱包
-                </li>
-            </ul>
-        </div>
+    	<div class="seize"></div>
+        <div class="box-1 text">钱 包</div>
+        <img @tap="show('wallet_detail')" :src="headImg" class="mui-action-2">
     </header>
     <div class="unContent indexContent">
         <div class="l-header">
-            <div class="desc-1">
-                <p>HD-新钱包</p>
-                <h3>0x208868EC...1b0B91c6Fa <img src="./img/l-ewm-x-ico1.png" alt=""></h3>
+            <div class="desc-1" @tap="show('address_ewm')">
+                <p>{{walletName}}</p>
+                <h3>{{walletAddress}}<img src="img/l-ewm-x-ico1.png"></h3>
             </div>
             <div class="desc-2">
                 <p>总资产(BCS)</p>
-                <h2 class="flex-box"><span>500.89</span> <b>≈¥7513.35</b></h2>
+                <h2 class="flex-box"><span>{{account}}</span> <b>≈ ¥{{account_cny}}</b></h2>
             </div>
         </div>
         <div class="content">
-            <h1 class="title flex-box"><span>我的资产</span> <img src="./img/lb-add-ico1.png" alt=""></h1>
+            <h1 class="title flex-box"><span>我的资产</span></h1>
             <ul>
-                <li @tap="" class="bcs-b1 flex-box">
+                <li class="bcs-b1 flex-box" @tap="show('trade')">
                     <div class="left flex-box">
-                        <img src="./img/logo-ico-1.png" alt="">BCS
+                        <img src="img/logo-ico-1.png">BCS
                     </div>
                     <div class="right">
-                        <h2>90000.87</h2>
-                        <p>≈¥4131039.93</p>
+                        <h2>{{account}}</h2>
+                        <p>≈ ¥{{account_cny}}</p>
                     </div>
                 </li>
             </ul>
@@ -77,11 +74,48 @@
 </body>
 
 <script type="text/javascript">
+	var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
     var vm = new Vue({
         el: '#app',
         data: {
-            isOtherList: false
-        }
+        	walletName:'',
+        	headImg:'',
+        	walletAddress:'',
+        	walletAddressReal:'',
+        	account:0,
+        	bcs2cny:6.2,
+        	isOtherList:false
+        },
+        computed:{
+        	account_cny:function(){
+        		return this.account*this.bcs2cny;
+        	}
+        },
+       	methods:{
+       		initData:function(){
+       			var walletinfo = getItem('walletInfo');
+	        	var userinfo = getItem('userInfo');
+	        	this.walletName = userinfo.walletName;
+	        	this.headImg = userinfo.headImg;
+	        	this.walletAddressReal = walletinfo.walletAddress;
+	        	this.walletAddress = shortAddress(walletinfo.walletAddress);
+	        	this.getBalance(walletinfo.walletAddress);
+       		},
+       		getBalance:function(){
+       			plus.nativeUI.showWaiting();
+       			var web3 = initWeb3();
+       			var _self = this;
+       			web3.eth.getBalance(_self.walletAddressReal,function(err,res){
+       				plus.nativeUI.closeWaiting();
+       				if(err){
+       					plus.nativeUI.alert('网络异常');
+       				}else{
+       					_self.account = res;
+       				}
+       			});
+       		}
+       	}
     })
 </script>
 </html>

@@ -57,7 +57,8 @@
     padding:0.3rem;
 }
 .skCodeWrapper .content .desc{
-    padding:0.5rem;
+	text-align: center;
+    padding:0.5rem 0;
     margin-top:0.4rem;
 }
 .skCodeWrapper .content .img-title{

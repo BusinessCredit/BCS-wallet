@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/mnemonicCurr.css">
+    <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>备份助记词</title>
+</head>
+<body>
+<div class="mnemonicWrapper" id="app">
+    <header class="flex-box header">
+        <img src="img/icon/back_black.png" class="mui-action-back">
+        <div class="box-1 text">备份助记词</div>
+        <span class="seize"></span>
+    </header>
+    <div class="unContent">
+        <div class="succTitle">
+            <div class="imgBox">
+                <img src="./img/gt-ico1.png" alt="">
+            </div>
+            <h4>请勿截图</h4>
+            <h4>请抄写下你的钱包助记词</h4>
+        </div>
+        <div class="content">
+           <h6>备份你的助记词</h6>
+            <p>助记词用于恢复钱包或重要钱包密码，将它准确的抄写
+                到纸上，并存放在只有你知道的安全地方。</p>
+            <div class="mnemonicInfor">
+                <span v-for='v in mnemonic'>{{v}}</span>
+            </div>
+            <div class="swBtn">
+                <a class="btn-ui sw-btn-1" @tap="nextStep">下一步</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
+	mui.plusReady(function(event){
+		var web = plus.webview.currentWebview();
+		vm.mnemonic = web.mnemonic.split(" ");
+	});
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            mnemonic: []
+        },
+        methods:{
+        	nextStep:function(){
+        		var _self = this;
+        		mui.openWindow({
+					url:'mnemonic_sub.html',
+					id:'mnemonic_sub',
+					extras:{
+						mnemonic:_self.mnemonic
+					}
+				});
+        	}
+        }
+    })
+</script>
+</html>

@@ -40,14 +40,8 @@
 </html>
 <script type="text/javascript">
 	mui.plusReady(function() {
-		vm.scanresult = mui.preload({
-			url: 'scanresult.html',
-			id: 'scanresult',
-			styles: {
-				"render": "always", //一直渲染  
-				"popGesture": "none"
-			}
-		});
+		var web = plus.webview.currentWebview();
+		vm.scanresult = plus.webview.getWebviewById(web.webid);
 	});
 	var vm = new Vue({
 		el: '#app',
@@ -111,13 +105,9 @@
 					curr.setStyle({
 						'popGesture': 'none'
 					});
-					curr.addEventListener('show', function() {
-						plus.navigator.setStatusBarStyle('light');
-					});
 					curr.addEventListener('close', function(e) {
 						self.headerObj.close();
 						self.noticeObj.close();
-						plus.navigator.setStatusBarStyle('dark');
 					});
 					self.headerObj = new plus.nativeObj.View('header', {
 						top: '0px',
@@ -134,7 +124,7 @@
 					setTimeout(function() {
 						self.headerObj.show();
 						self.noticeObj.show();
-					}, 200);
+					}, 500);
 					self.headerObj.addEventListener('click', function(event) {
 						var clientX = event.clientX;
 						var clientY = event.clientY;
@@ -199,14 +189,11 @@
 			},
 			showresult: function(result) {
 				var self = this;
-				mui.fire(self.scanresult, 'initMethod', {
-					result: result
-				});
+				self.scanresult.evalJS('vm.scanInit('+JSON.stringify(result)+')');
 				setTimeout(function() {
 					self.headerObj.hide();
 					self.noticeObj.hide();
-					plus.navigator.setStatusBarStyle('dark');
-					self.scanresult.show("slide-in-right", 300);;
+					mui.back();
 				}, 150);
 			},
 			//失败回调

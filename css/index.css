@@ -5,6 +5,7 @@
 .indexWrapper header .mui-action-2{
     width:0.7rem;
     height:0.7rem;
+    border-radius: 50%;
 }
 .indexWrapper .l-header{
     padding:0.2rem;

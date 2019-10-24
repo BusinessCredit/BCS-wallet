@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/walletCurr.css">
+ 	<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/rem.js"></script>
+	<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+	<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/qrcode.min.js" type="text/javascript" charset="utf-8"></script>
+    <title>导出Keystore</title>
+    <style type="text/css">
+        .tipsContent{
+            position:relative;
+            top:50%;
+            left:50%;
+            transform: translate(-50%,-50%);
+            width:6.9rem;
+            height:4.7rem;
+            background-color:white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .tipsContent img{
+            width:0.68rem;
+            height:0.84rem;
+            margin-top:0.5rem;
+        }
+        .tipsContent h4{
+            line-height:2;
+            font-size:0.32rem;
+            margin-bottom:0.2rem;
+        }
+        .tipsContent p{
+            text-align: left;
+            padding:0.2rem 0.3rem;
+        }
+        .tipsContent .k-btn-ui{
+            height:0.9rem;
+            line-height:0.9rem;
+            text-align: center;
+            color:white;
+            width:100%;
+            background-color:#f74742;
+            display: block;
+            position:absolute;
+            bottom:0;
+            left:0;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="setEalletWrapper importWrapper exportWrapper" id="app">
+    <header class="flex-box header">
+        <img src="img/icon/back_black.png" class="mui-action-back">
+        <div class="box-1 text">导出Keystore</div>
+        <span class="seize"></span>
+    </header>
+    <div class="unContent">
+        <!--提示-->
+        <div class="tipsMask mask" v-if="tips">
+            <div class="tipsContent">
+                <img src="img/sn-ico.png">
+                <h4>请勿截图</h4>
+                <p>请确保四周无人及无任何摄像头！勿用截图或拍照的方式保存Keystore或对应的二维码。</p>
+                <a class="k-btn-ui" @tap="tips=false">知道了</a>
+            </div>
+        </div>
+        <div class="mui-content">
+            <div class="importTitle">
+                <div id="segmentedControl" class="mui-segmented-control mui-segmented-control-primary mui-segmented-control-negative">
+                    <a class="mui-control-item mui-active" href="#item1">Keystore</a>
+                    <a class="mui-control-item" href="#item2">二维码</a>
+                </div>
+            </div>
+            <div>
+                <div id="item1" class="mui-control-content mui-active">
+                    <div class="content">
+                        <ul>
+                            <li>
+                                <h6>离线保存</h6>
+                                <p>切勿保存至邮箱、记事本、网盘、聊天工具等，非常危险</p>
+                            </li>
+                            <li>
+                                <h6>请勿使用网络传输</h6>
+                                <p>请勿通过网络工具传输，一旦被黑客获取将造成不可挽回
+                                    的资产损失，建议离线设备通过二维码方式传输。</p>
+                            </li>
+                            <li>
+                                <h6>密码管理工具保存</h6>
+                                <p>建议使用密码工具管理</p>
+                            </li>
+                            <li class="flex-box">
+                                <textarea v-model="keystoreV3" readonly></textarea>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="swBtn">
+                        <a class="btn-ui sw-btn-1" @tap='copy(keystoreV3)'>复制Keystore</a>
+                    </div>
+                </div>
+                <div id="item2" class="mui-control-content">
+                    <div class="content">
+                        <ul>
+                            <li>
+                                <h6>仅供直接扫描</h6>
+                                <p>二维码禁止保存、截图、以及拍照。仅供用户在安全环境
+                                    下直接扫描来方便的导入钱包。</p>
+                            </li>
+                            <li>
+                                <h6>在安全环境下使用</h6>
+                                <p>请在确保四周无人及无摄像头的情况下使用，二维码一旦
+                                    被他人获取将造成不可挽回的资产损失。</p>
+                            </li>
+                        </ul>
+                        <div class="ewmBox">
+                            <div id='qrcode'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+	var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            tips: false,
+            keystoreV3: ''
+        },
+        mounted:function(){
+        	var walletinfo = getItem('walletInfo');
+            this.keystoreV3 = JSON.stringify(walletinfo.keystoreV3);
+            this.createEwm();
+        },
+        methods: {
+        	createEwm:function(){
+        		var qrcode = new QRCode(document.getElementById("qrcode"), {
+					width : 480,
+					height : 480
+				});
+				qrcode.makeCode(this.keystoreV3)
+        	}
+        }
+    })
+</script>
+</html>

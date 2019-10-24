@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, minimum-scale=1,user-scalable=no,viewport-fit=cover">
     <link rel="stylesheet" href="css/mui.min.css">
     <link rel="stylesheet" href="css/unified.css">
     <link rel="stylesheet" href="css/walletCurr.css">
@@ -11,6 +11,8 @@
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
     <title>创建钱包</title>
 </head>
 <body>
@@ -29,52 +31,112 @@
             <ul>
                 <li class="flex-box">
                     <span>钱包名称</span>
-                    <input class="box-1" type="text" placeholder="请创建钱包名称">
+                    <input class="box-1" v-model="wname"  type="text" placeholder="请输入钱包名称">
                 </li>
                 <li class="flex-box">
                     <span>设置密码</span>
-                    <input class="box-1" type="text" placeholder="请设置密码">
+                    <input class="box-1" v-model="pwd" type="password" placeholder="请设置密码">
                 </li>
                 <li class="flex-box">
                     <span>重复密码</span>
-                    <input class="box-1" type="text" placeholder="请再次输入密码">
+                    <input class="box-1" v-model="repwd" type="password" placeholder="请再次确认密码">
                 </li>
                 <li class="flex-box">
                     <span>密码提示</span>
-                    <input class="box-1" type="text" placeholder="请输入密码提示">
+                    <input class="box-1" type="text" v-model="notice" placeholder="输入密码提示">
                 </li>
             </ul>
             <div class="mui-input-row mui-radio mui-left">
-                <label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
-                <input name="radio1" type="radio">
+                <label>我已经仔细阅读并同意 <a @tap="show('service')">《服务及隐私条款》</a></label>
+                <input value="1" v-model="checked" type="radio">
             </div>
             <div class="swBtn">
                 <a class="btn-ui sw-btn-1" @tap="doCreate">创建钱包</a>
-                <a class="btn-ui sw-btn-2" @tap="show('wallet_import')">导入钱包</a>
             </div>
         </div>
     </div>
 </div>
 </body>
+<script src="js/database.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-    var vm = new Vue({
+	var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
+	var vm = new Vue({
         el: '#app',
         data: {
+			wname:"",
+			pwd:'',
+			repwd:'',
+			notice:'',
+			checked:0
         },
         methods: {
-           doCreate:function(){
-           		plus.nativeUI.showWaiting('创建中',{
-           				style:'black',
-           				color:'#4c90c6',
-           				width:'25%',
-           				height:'10%',
-           				background:'#E0E0E0'
-           			})
-           		setTimeout(function(){
-           			plus.nativeUI.closeWaiting();
-           			show('wallet_words')
-           		},3000)
-           }
+        	createAddress:function(ks){
+        		var _self = this;
+		        ks.keyFromPassword(_self.pwd, function (err, pwDerivedKey) {
+					ks.generateNewAddress(pwDerivedKey, 1);
+					var addresses = ks.getAddresses();
+					var web3 = initWeb3();
+					var keystoreV3 = web3.eth.accounts.privateKeyToAccount('0x' + ks.exportPrivateKey(addresses[0], pwDerivedKey)).encrypt(_self.pwd);;
+					setItem('userInfo',{
+						headImg:'img/defaulthead.png',
+						walletName:_self.wname,
+						pwdNotice:_self.notice
+					});
+					setItem('walletInfo',{
+						walletAddress: addresses[0],
+						keystoreV3: keystoreV3,
+						ks: ks
+					});
+					plus.nativeUI.closeWaiting();
+					plus.webview.getLaunchWebview().evalJS('vm.initData()');
+					setTimeout(function(){
+						plus.webview.getLaunchWebview().show();
+						plus.webview.currentWebview().close();
+					},200);
+		        });
+        	},
+            doCreate:function(){
+				var _self = this;
+				_self.wname = _self.wname.trim();
+				if(!_self.wname){
+					mui.toast('请输入钱包名称');return
+				}
+				_self.pwd = _self.pwd.trim();
+				if(!_self.pwd){
+					mui.toast('请设置钱包密码');return
+				}
+				_self.repwd = _self.repwd.trim();
+				if(!_self.repwd){
+					mui.toast('请确认钱包密码');return
+				}
+				if(_self.pwd.length<6){
+					mui.toast('密码长度至少6位');return
+				}
+				if(_self.pwd != _self.repwd){
+					mui.toast('两次密码不同');return
+				}
+				_self.notice = _self.notice.trim();
+				if(!_self.notice){
+					mui.toast('请输入密码提示');return
+				}
+				if(!_self.checked){
+					mui.toast('请仔细阅读服务条款');return
+				}
+				plus.nativeUI.showWaiting('创建中');
+				//种子seed
+				var randomSeed = lightwallet.keystore.generateRandomSeed();
+				lightwallet.keystore.createVault(
+					{
+						password: _self.pwd,
+						seedPhrase: randomSeed,
+						hdPathString: "m/44'/60'/0'/0"
+					},(err, ks) => {
+						_self.createAddress(ks);
+					}
+				);
+				
+			}
         }
     });
 </script>

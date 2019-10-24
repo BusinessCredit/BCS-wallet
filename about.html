@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
@@ -9,14 +8,18 @@
 		<link rel="stylesheet" href="css/index.css">
 		<link rel="stylesheet" href="css/about.css">
 		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/rem.js"></script>
 		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/update.js" type="text/javascript" charset="utf-8"></script>
 		<title>关于</title>
+		<style type="text/css">
+			.version_new{
+				color: gray;font-size: 0.2rem;margin-right: 0.1rem;
+			}
+		</style>
 	</head>
-
 	<body>
 		<div class="centerWrapper" id="app">
 			<header class="flex-box header">
@@ -27,53 +30,70 @@
 			<div class="unContent">
 				<div class="aboutTitle">
 					<img src="img/logo-ico-1.png">
-					<h6>当前版本：1.1.0</h6>
-					<p>BCS是一款移动端钱包APP，它旨在为BCS用户提供一款安全放心，简单好用、功能强大的数字资产钱包应用。</p>
+					<h6>v {{version}}</h6>
+					<p>BCS钱包是一款移动端钱包APP，它旨在为BCS用户提供一款安全放心，简单好用、功能强大的数字资产钱包应用。</p>
 				</div>
 				<div class="content">
 					<ul>
-						<li class="flex-box">
+						<li class="flex-box" @tap='doUpdate'>
 							<span>版本更新</span>
-							<b>v2.0</b>
+							<b><span class="version_new" v-if='is_update'>发现新版本</span>v{{version_new}}</b>
 						</li>
-						<li class="flex-box">
+						<li class="flex-box" @tap="show('service')">
 							<span>使用协议</span>
-							<img src="img/right-ico.png" alt="">
+							<img src="img/right-ico.png">
 						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 	</body>
-	<script>
+	<script type="text/javascript">
+		var immersed = getImmersedHeight();
+		$(".header").css('padding-top', (immersed + 5) + 'px');
 		var vm = new Vue({
 			el: '#app',
 			data: {
-				isOtherList: false
+				version: '',
+				version_new: '',
+				is_update:false,
+				installdata:{}
+			},
+			mounted:function(){
+				this.version_check();
 			},
 			methods: {
-				//获取默认数据
-				getData() {
-					var self = this
-					this.list = []
-					$.ajax({
-						type: "get",
-						url: '',
-						beforeSend: function(xhr) {
-							token = getItem("Userdata").token;
-							xhr.setRequestHeader("Authorization", "Basic " + token);
-						},
-						success: function(data) {
-
-						},
-						error: function(data) {
-							console.log('系统繁忙!');
-						}
-					});
+				doUpdate:function(){
+					if(!this.is_update){
+						return;
+					}
+					install(this.installdata);
 				},
-			},
-			mounted() {
-
+				version_check:function() {
+					var _self = this;
+					plus.runtime.getProperty(plus.runtime.appid, function(info) {
+						_self.version = info.version;
+						_self.version_new = info.version;
+						$.ajax({
+							type: "get",
+							url: UpdataURL,
+							dataType: "json", 
+							data: {
+								version: info.version
+							},
+							success: function(item) {
+								if(item.status) {
+									_self.is_update = true;
+									_self.version_new = item.version;
+									_self.installdata = item;
+								}
+							},
+							error: function(data) {
+								console.log(JSON.stringify(data));
+							}
+						});	
+					})	
+				}
 			}
 		})
 	</script>

@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>内置浏览器</title>
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			header {
+				width: 100%;
+				height: 44px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				font-size: 17px;
+				text-align: center;
+				line-height: 44px;
+				z-index: 9999;
+				-ms-touch-action: none;
+			}
+			
+			.nvbt {
+				width: 15%;
+				height: 100%;
+				float: left;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			
+			.nvbt:active {
+				background-color: rgba(170, 170, 170, 0.1);
+			}
+			
+			.nvtt {
+				width: 70%;
+				height: 100%;
+				color: #cccccc;
+				float: left;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			
+			#url {
+				width: 98%;
+				-webkit-user-select: auto;
+				padding-left: 0;
+				padding-right: 0;
+				background: rgba(0, 0, 0, 0);
+				border: 0px;
+				border-bottom: 1px solid #ECB100;
+				border-radius: 0;
+				outline: none;
+			}
+			
+			.iback {
+				background: no-repeat center center url('img/icon/back_black.png');
+				background-size: 20px 20px;
+			}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			var ws = null,
+				url = null,
+				embed = null;
+			mui.plusReady(function(){
+				ws = plus.webview.currentWebview();
+				url = ws.url;
+				document.getElementById("url").value=url;
+				ws.addEventListener('show', createEmbed, false);
+			});
+			// 创建子Webview
+			function createEmbed() {
+				var topoffset = '45px';
+				if(plus.navigator.isImmersedStatusbar()) { // 兼容immersed状态栏模式
+					topoffset = (Math.round(plus.navigator.getStatusbarHeight()) + 45) + 'px';
+				}
+				plus.nativeUI.showWaiting('', {
+					style: 'black',
+					modal: false,
+					background: 'rgba(0,0,0,0)'
+				});
+				embed = plus.webview.create(url, 'embed', {
+					top: topoffset,
+					bottom: '0px',
+					position: 'dock',
+					dock: 'bottom',
+					bounce: 'vertical'
+				});
+				ws.append(embed);
+				embed.addEventListener('loaded', function() {
+					plus.nativeUI.closeWaiting();
+				}, false);
+				embed.addEventListener('loading', function() {
+					plus.nativeUI.showWaiting('', {
+						style: 'black',
+						modal: false,
+						background: 'rgba(0,0,0,0)'
+					});
+				}, false);
+			}
+			// 打开网址
+			function openUrl() {
+				var url = document.getElementById("url");
+				embed.loadURL(url.value);
+				url.blur();
+			}
+			// 页面加载后自动打开
+			document.addEventListener("DOMContentLoaded", function() {
+				if(embed) {
+					openUrl();
+				} else {
+					auto = true;
+				}
+			}, false);
+			// 页面跳转完成事件
+			function onBrowserLoading() {
+				document.getElementById("url").value = embed.getURL();
+			}
+		</script>
+
+	</head>
+
+	<body>
+		<header id="header">
+			<div class="nvbt iback mui-action-back"></div>
+			<div class="nvtt">
+				<form action="?" method="get" onsubmit="openUrl();return false;">
+					<input id="url" type="url" value="http://m.weibo.cn/u/3196963860" />
+				</form>
+			</div>
+			<div class="nvbt" onclick="openUrl();">Go</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="js/immersed.js"></script>
+
+</html>

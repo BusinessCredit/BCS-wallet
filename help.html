@@ -14,9 +14,8 @@
 		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-		<style>
-
-		</style>
+		<script src="mescroll/mescroll.min.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="mescroll/mescroll.min.css">
 	</head>
 
 	<body>
@@ -33,46 +32,92 @@
 				</div>
 				<div class="content">
 					<h1>常见问题</h1>
-					<ul>
-						<li>如何找回没有映射的BCS钱包中的BCS代币？</li>
-						<li>为什么一定要备份助记词？</li>
-						<li>如何创建BCS钱包？</li>
-						<li>如何修改钱包密码？</li>
-						<li>BCS转账/收款教程？</li>
-					</ul>
+					<div class="mescroll" id="mescroll" style="height: 12rem;">
+						<ul id='warpId'>
+							<li @tap="openBrower(item.url)" v-for='item in list'>如何找回没有映射的BCS钱包中的BCS代币？</li>
+						</ul>
+					</div>
+
 				</div>
 			</div>
 		</div>
 	</body>
-	<script>
+	<script type="text/javascript">
+		var immersed = getImmersedHeight();
+		$(".header").css('padding-top', (immersed + 5) + 'px');
 		var vm = new Vue({
 			el: '#app',
 			data: {
-				isOtherList: false
+				mescroll: [],
+				list: []
 			},
 			methods: {
-				//获取默认数据
-				getData() {
-					var self = this
-					this.list = []
-					$.ajax({
-						type: "get",
-						url: '',
-						beforeSend: function(xhr) {
-							token = getItem("Userdata").token;
-							xhr.setRequestHeader("Authorization", "Basic " + token);
-						},
-						success: function(data) {
-
-						},
-						error: function(data) {
-							console.log('系统繁忙!');
+				openBrower:function(url){
+					mui.openWindow({
+						url:'browser.html',
+						id:'browser',
+						extras:{
+							url:url
 						}
 					});
 				},
+				initData: function(page) {
+					var self = this;
+					$.ajax({
+						type: "get",
+						url: HelpList,
+						data: {
+							page: page.num
+						},
+						dataType: "json",
+						success: function(data) {
+							if(data.status) {
+								var result = data.result;
+								if(page.num == 1) {
+									self.list = result.list;
+								} else {
+									self.list = self.list.concat(result.list);
+								}
+								self.mescroll.endByPage(result.list.length, result.totalPage);
+							} else {
+								self.list = [];
+							}
+						},
+						error: function(data) {
+							console.log(JSON.stringify(data));
+						}
+					});
+				},
+				initMescroll: function(mescrollId, warpId) {
+					var self = this;
+					var mescroll = new MeScroll(mescrollId, {
+						down:{
+							isLock:true
+						},
+						up: {
+							callback: function(page) {
+								self.initData(page);
+							},
+							page: {
+								num: 0,
+								size: 20,
+								time: null
+							},
+							isBounce: false,
+							noMoreSize: 40,
+							empty: {
+								warpId: warpId,
+								icon: "img/icon/none.png",
+								tip: "",
+							},
+							htmlNodata: '<p class="upwarp-nodata">没有更多了哦 ^v^</p>'
+						}
+					});
+					return mescroll;
+				}
 			},
-			mounted() {
-
+			mounted: function() {
+				this.mescroll = this.initMescroll('mescroll', 'warpId');
 			}
 		})
 	</script>

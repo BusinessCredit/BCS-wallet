@@ -12,7 +12,7 @@
 	max-height: 100000px;
 }
 textarea{
-	display: table;
+	/*display: table;*/
 }
 *, *:before, *:after {
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -190,9 +190,9 @@ html,body{
 	height:100%;
 }
 .header{
-	height:1.5rem;
+	height:1.2rem;
 	padding:0 0.2rem;
-	padding-top:0.3rem;
+	/* padding-top:0.3rem; */
 	box-sizing: border-box;
 	border-bottom:1px solid #eee;
 	position: fixed;
@@ -211,7 +211,7 @@ html,body{
 }
 .unContent{
 	font-size:0.28rem;
-	padding-top:1.5rem;
+	padding-top:1.2rem;
 	width:100%;
 	position:relative;
 	font-size:0.28rem;

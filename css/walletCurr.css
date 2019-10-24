@@ -61,7 +61,6 @@
     line-height:1rem;
     text-align: center;
     border-radius: 5px;
-    margin-top:1rem;
 }
 .setEalletWrapper .swBtn .sw-btn-1{
     background-color:#4c90c6;
@@ -94,6 +93,7 @@
     border:none;
     background-color:#f4f5f8;
     margin:0;
+    height: 3.5rem;
 }
 .importWrapper #item1 ul li:first-child{
     margin:0;

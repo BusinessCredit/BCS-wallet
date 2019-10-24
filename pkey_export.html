@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
-    <link rel="stylesheet" href="../skin/css/mui.min.css">
-    <link rel="stylesheet" href="./css/unified.css">
-    <link rel="stylesheet" href="./css/walletCurr.css">
-    <script src="../skin/js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../dapp/js/rem.js"></script>
-    <script src="../skin/js/mui.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../skin/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../skin/js/public.js" type="text/javascript" charset="utf-8"></script>
-    <title>钱包</title>
-    <style>
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/walletCurr.css">
+ 	<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/rem.js"></script>
+	<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+	<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/qrcode.min.js" type="text/javascript" charset="utf-8"></script>
+    <title>导出私钥</title>
+    <style type="text/css">
         .tipsContent{
             position:relative;
             top:50%;
@@ -57,7 +60,7 @@
 <body>
 <div class="setEalletWrapper importWrapper exportWrapper" id="app">
     <header class="flex-box header">
-        <img src="../dapp/img/back_black.png" class="mui-action-back">
+        <img src="img/icon/back_black.png" class="mui-action-back">
         <div class="box-1 text">导出私钥</div>
         <span class="seize"></span>
     </header>
@@ -65,7 +68,7 @@
         <!--提示-->
         <div class="tipsMask mask" v-if="tips">
             <div class="tipsContent">
-                <img src="./img/sn-ico.png" alt="">
+                <img src="img/sn-ico.png" alt="">
                 <h4>请勿截图</h4>
                 <p>请确保四周无人及无任何摄像头！勿用截图或拍照的方式保存私钥或对应的二维码。</p>
                 <a class="k-btn-ui" @tap="tips=false">知道了</a>
@@ -96,12 +99,12 @@
                                 <p>建议使用密码工具管理</p>
                             </li>
                             <li class="flex-box">
-                                <textarea rows="5" v-model="word" readonly placeholder="输入助记词，用空格分隔"></textarea>
+                                <textarea style="height: 2rem;margin-top: 0.5rem;" v-model="privateKey" readonly></textarea>
                             </li>
                         </ul>
                     </div>
                     <div class="swBtn">
-                        <a class="btn-ui sw-btn-1">复制私钥</a>
+                        <a class="btn-ui sw-btn-1" @tap='copy(privateKey)'>复制私钥</a>
                     </div>
                 </div>
                 <div id="item2" class="mui-control-content">
@@ -119,7 +122,7 @@
                             </li>
                         </ul>
                         <div class="ewmBox">
-                            <img src="./img/ewm-2.png" alt="">
+                            <div id='qrcode'></div>
                         </div>
                     </div>
                 </div>
@@ -129,37 +132,28 @@
     </div>
 </div>
 </body>
-<script>
+<script type="text/javascript">
+	var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
+	mui.plusReady(function(event){
+		var web = plus.webview.currentWebview();
+		vm.privateKey = web.privateKey;
+		vm.createEwm();
+	});
     var vm = new Vue({
         el: '#app',
         data: {
             tips: true,
-            word: '0x2088668EC11221F5687a7568AAFab291b0B9\n' +
-            '1c6Fa0',//助记词
+            privateKey: ''
         },
-        methods: {
-            //获取默认数据
-            getData(){
-                var self = this
-                this.list = []
-                $.ajax({
-                    type: "get",
-                    url: '',
-                    beforeSend: function(xhr) {
-                        token = getItem("Userdata").token;
-                        xhr.setRequestHeader("Authorization", "Basic " + token);
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function(data) {
-                        console.log('系统繁忙!');
-                    }
-                });
-            },
-        },
-        mounted(){
-
+        methods:{
+        	createEwm:function(){
+	    		var qrcode = new QRCode(document.getElementById("qrcode"), {
+					width : 480,
+					height : 480
+				});
+				qrcode.makeCode(this.privateKey)
+        	}
         }
     })
 </script>

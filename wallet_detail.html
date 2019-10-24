@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/unified.css">
+		<link rel="stylesheet" href="css/walletCurr.css">
+		<link rel="stylesheet" href="css/wtInfor.css">
+		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/rem.js"></script>
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+		<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
+		<script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
+		<title>钱包详情</title>
+	</head>
+	<body>
+		<div class="wInforWrapper" id="app">
+			<header class="flex-box header">
+				<img src="img/icon/back_black.png" class="mui-action-back">
+				<div class="box-1 text">BCS</div>
+				<span class="seize"></span>
+			</header>
+			<div class="unContent">
+				<div class="wInforTitle">
+					<img src="img/logo-ico-1.png" alt="">
+					<p>{{walletAddress}}</p>
+				</div>
+				<div class="contentList">
+					<ul>
+						<li class="flex-box" @tap="show('reset_pwd')">
+							<img src="img/w-i-ico3.png">
+							<p class="box-1">修改密码</p>
+							<i class="right-ico"></i>
+						</li>
+						<li class="flex-box" @tap="pkeyExport">
+							<img src="img/w-i-ico3.png">
+							<p class="box-1">导出私钥</p>
+							<i class="right-ico"></i>
+						</li>
+						<li class="flex-box" @tap="kstoreExport">
+							<img src="img/w-i-ico4.png">
+							<p class="box-1">导出Keystore</p>
+							<i class="right-ico"></i>
+						</li>
+					</ul>
+					<div class="btnBox">
+						<a class="btn-ui btn-b-1" @tap='wordsExport'>备份助记词</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var immersed = getImmersedHeight();
+		$(".header").css('padding-top', (immersed + 5) + 'px');
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				walletAddress:'',
+				walletAddress_real:'',
+				account:'--',
+				keystoreV3:''
+			},
+			mounted() {
+				var walletinfo = getItem('walletInfo');
+				this.keystoreV3 = walletinfo.keystoreV3;
+				this.walletAddress = shortAddress(walletinfo.walletAddress);
+				this.walletAddress_real = walletinfo.walletAddress;
+			},
+			methods:{
+				wordsExport:function(){
+					plus.nativeUI.prompt('输入密码',function(e){
+						if(e.index==0){
+							if(!e.value){
+								plus.nativeUI.toast('请输入密码');return;
+							}
+							var ks = getItem('walletInfo').ks;
+							var mneKeystore = lightwallet.keystore.deserialize(JSON.stringify(ks));
+							mneKeystore.keyFromPassword('lxf123456', (err, pwDerivedKey) => {
+								var mnemonic = mneKeystore.getSeed(pwDerivedKey);
+								mui.openWindow({
+									url:'mnemonic_export.html',
+									id:'mnemonic_export',
+									extras:{
+										mnemonic:mnemonic
+									}
+								});
+							});
+						}
+					})
+					
+				},
+				pkeyExport:function(){
+					var _self = this;
+					plus.nativeUI.prompt('输入密码',function(e){
+						if(e.index==0){
+							if(!e.value){
+								plus.nativeUI.toast('请输入密码');return;
+							}
+							plus.nativeUI.showWaiting();
+							try{
+								var web3 = initWeb3();
+								var account = web3.eth.accounts.decrypt(_self.keystoreV3,e.value);
+								mui.openWindow({
+									url:'pkey_export.html',
+									id:'pkey_export',
+									extras:{
+										privateKey:account.privateKey
+									}
+								});
+							}catch(e){
+								console.log(JSON.stringify(e));
+								plus.nativeUI.closeWaiting();
+								plus.nativeUI.toast('密码有误');
+							}
+							
+						}
+					})
+				},
+				kstoreExport:function(){
+					var _self = this;
+					plus.nativeUI.prompt('输入密码',function(e){
+						if(e.index==0){
+							if(!e.value){
+								plus.nativeUI.toast('请输入密码');return;
+							}
+							plus.nativeUI.showWaiting();
+							try{
+								var web3 = initWeb3();
+								var account = web3.eth.accounts.decrypt(_self.keystoreV3,e.value);
+								plus.nativeUI.closeWaiting();
+								show("kstore_export");
+							}catch(e){
+								plus.nativeUI.closeWaiting();
+								plus.nativeUI.toast('密码有误');
+							}
+							
+						}
+					})
+				}
+			}
+		})
+	</script>
+
+</html>

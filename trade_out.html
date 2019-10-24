@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1, minimum-scale=1">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/unified.css">
+    <link rel="stylesheet" href="css/walletCurr.css">
+    <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <title>转账</title>
+</head>
+<body>
+<div class="setEalletWrapper" id="app">
+    <header class="flex-box header">
+        <img src="img/icon/back_black.png" class="mui-action-back">
+        <div class="box-1 text">转账</div>
+        <img @tap="show('scan_code')" src="img/other-l-ico1.png">
+    </header>
+    <div class="unContent">
+        <!--密码-->
+        <div class="mask passwordBox" v-if="passwordShow">
+            <div class="psdConetnt">
+                <h1>输入密码</h1>
+                <div class="infor">
+                    <p>为了保障您的账户安全，请输入密码</p>
+                    <div class="mui-input-row mui-password">
+                        <input type="password" class="mui-input-password">
+                    </div>
+                    <div class="btn-ui flex-box">
+                        <a class="btn-ui-1" @tap="passwordShow=false">取消</a>
+                        <a class="btn-ui-2" @tap="passwordShow=false">确认</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <ul>
+                <li class="flex-box">
+                    <span>收款地址</span>
+                    <input class="box-1" type="text" placeholder="请输入收款人钱包地址">
+                </li>
+                <li class="flex-box">
+                    <span>转账金额</span>
+                    <input class="box-1" type="text" placeholder="请输入转账金额">
+                </li>
+                <li class="flex-box">
+                    <span>钱包密码</span>
+                    <input class="box-1" type="password" placeholder="请输入钱包密码">
+                </li>
+                <li class="flex-box">
+                    <span>旷工费用</span>
+                    <b class="text-right box-1" style="color:#f74e49;">100 BCS</b>
+                </li>
+            </ul>
+            <div class="swBtn" style="margin-top: 1rem;">
+                <a class="btn-ui sw-btn-1" @tap="show('trade_result')">下一步</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+	var immersed = getImmersedHeight();
+	$(".header").css('padding-top', (immersed + 5) + 'px');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            passwordShow: false,
+            msg: '',
+        },
+        methods: {
+            //获取默认数据
+            getData(){
+                var self = this
+                this.list = []
+                $.ajax({
+                    type: "get",
+                    url: '',
+                    beforeSend: function(xhr) {
+                        token = getItem("Userdata").token;
+                        xhr.setRequestHeader("Authorization", "Basic " + token);
+                    },
+                    success: function(data) {
+
+                    },
+                    error: function(data) {
+                        console.log('系统繁忙!');
+                    }
+                });
+            },
+            focus() {
+                this.$refs.pwd.focus();
+            },
+        },
+        mounted(){
+
+        }
+    })
+</script>
+</html>
