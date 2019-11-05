@@ -11,53 +11,41 @@
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
     <title>转账</title>
+    <style type="text/css">
+    	.mui-input-range .mui-tooltip{
+    		display: none;
+    	}
+    </style>
 </head>
 <body>
 <div class="setEalletWrapper" id="app">
-    <header class="flex-box header">
-        <img src="img/icon/back_black.png" class="mui-action-back">
-        <div class="box-1 text">转账</div>
-        <img @tap="show('scan_code')" src="img/other-l-ico1.png">
-    </header>
     <div class="unContent">
-        <!--密码-->
-        <div class="mask passwordBox" v-if="passwordShow">
-            <div class="psdConetnt">
-                <h1>输入密码</h1>
-                <div class="infor">
-                    <p>为了保障您的账户安全，请输入密码</p>
-                    <div class="mui-input-row mui-password">
-                        <input type="password" class="mui-input-password">
-                    </div>
-                    <div class="btn-ui flex-box">
-                        <a class="btn-ui-1" @tap="passwordShow=false">取消</a>
-                        <a class="btn-ui-2" @tap="passwordShow=false">确认</a>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="content">
             <ul>
                 <li class="flex-box">
                     <span>收款地址</span>
-                    <input class="box-1" type="text" placeholder="请输入收款人钱包地址">
+                    <input class="box-1" type="text" v-model="address" placeholder="请输入收款人地址">
                 </li>
                 <li class="flex-box">
                     <span>转账金额</span>
-                    <input class="box-1" type="text" placeholder="请输入转账金额">
+                    <input class="box-1" type="text" v-model="num" placeholder="请输入转账金额">
                 </li>
                 <li class="flex-box">
                     <span>钱包密码</span>
-                    <input class="box-1" type="password" placeholder="请输入钱包密码">
+                    <input class="box-1" type="password" v-model="pwd" placeholder="请输入钱包密码">
                 </li>
-                <li class="flex-box">
+                <li class="flex-box" style="justify-content: space-between;">
                     <span>旷工费用</span>
-                    <b class="text-right box-1" style="color:#f74e49;">100 BCS</b>
+			        <div class="mui-input-row mui-input-range">
+		            	<input type="range" :min='gas_min' v-model="gas_price" :max='gas_max' id='block-range'>
+		        	</div>
+		        	<span>{{tx_fee}} BCS</span>
                 </li>
             </ul>
             <div class="swBtn" style="margin-top: 1rem;">
-                <a class="btn-ui sw-btn-1" @tap="show('trade_result')">下一步</a>
+                <a class="btn-ui sw-btn-1" @tap="soSub()">下 一 步</a>
             </div>
         </div>
     </div>
@@ -69,35 +57,68 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            passwordShow: false,
-            msg: '',
+        	address:'',
+        	num:0.1,
+        	pwd:'',
+        	gas_limit:21000,
+        	gas_price:0,
+        	gas_min:0,
+        	gas_max:0
+        },
+        computed:{
+        	tx_fee:function(){
+        		return parseFloat((this.gas_limit*(this.gas_price/1e9)).toFixed(8))
+        	}
         },
         methods: {
-            //获取默认数据
-            getData(){
-                var self = this
-                this.list = []
-                $.ajax({
-                    type: "get",
-                    url: '',
-                    beforeSend: function(xhr) {
-                        token = getItem("Userdata").token;
-                        xhr.setRequestHeader("Authorization", "Basic " + token);
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function(data) {
-                        console.log('系统繁忙!');
-                    }
-                });
-            },
-            focus() {
-                this.$refs.pwd.focus();
-            },
+           	soSub:function(){
+           		if(!this.address){
+           			mui.toast('请输入收款地址');return;
+           		}
+           		if(!this.num){
+           			mui.toast('请输入转账金额');return;
+           		}
+           		if(!this.pwd){
+           			mui.toast('请输入钱包密码');return;
+           		}
+           		var _self = this;
+           		var walletInfo = getItem('walletInfo');
+           		plus.nativeUI.showWaiting();
+           		var web3 = initWeb3();
+           		var account = web3.eth.accounts.decrypt(walletInfo.keystoreV3, _self.pwd);
+        		var	value = web3.utils.toWei(_self.num.toString(), 'ether');
+			    web3.eth.accounts.wallet.add(account);
+			    web3.eth.sendTransaction({
+			        from: walletInfo.walletAddress,
+			        to: _self.address,
+			        value: value,
+			        gasPrice: _self.gas_price*1e9.toString(),
+			        gas: _self.gas_limit.toString()
+			    }, function (error, txhash) {
+			    	plus.nativeUI.closeWaiting();
+			    	if(error){
+			    		mui.alert('转账失败');
+			    		_self.address = '';
+			    		_self.num = '';
+			    		_self.pwd = '';
+			    	}else{
+			    		mui.alert('转账请求已提交，请耐心等待');	
+			    	}
+			    });
+           	},
+           	getGasPrice:function(){
+           		var _self = this;
+           		var web3 = initWeb3();
+           		web3.eth.getGasPrice(function(err,res){
+           			console.log(res);
+           			_self.gas_price = res/1e9;
+           			_self.gas_min = parseInt(res/1e9*0.7);
+           			_self.gas_max = parseInt(res/1e9*1.7);
+           		});
+           	}
         },
-        mounted(){
-
+        mounted:function(){
+       		this.getGasPrice();
         }
     })
 </script>

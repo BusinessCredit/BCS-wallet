@@ -28,7 +28,7 @@
 				for(var i = 0; i < all.length; i++) {
 					all[i].hide();
 				};
-				show('init');
+				show_without_title('init');
 			}else{
 				vm.initData();
 				plus.navigator.closeSplashscreen();
@@ -39,12 +39,12 @@
 <body>
 <div class="indexWrapper footerWrapper" id="app">
     <div class="otherMask mask" @tap="isOtherList=false" v-if="isOtherList"></div>
-    <header class="flex-box header otherHeader">
+    <header class="flex-box header otherHeader" >
     	<div class="seize"></div>
         <div class="box-1 text">钱 包</div>
         <img @tap="show('wallet_detail')" :src="headImg" class="mui-action-2">
     </header>
-    <div class="unContent indexContent">
+    <div class="unContent indexContent" style="padding-top: 1.2rem;">
         <div class="l-header">
             <div class="desc-1" @tap="show('address_ewm')">
                 <p>{{walletName}}</p>
@@ -89,7 +89,7 @@
         },
         computed:{
         	account_cny:function(){
-        		return this.account*this.bcs2cny;
+        		return parseFloat(this.account)*this.bcs2cny;
         	}
         },
        	methods:{
@@ -106,12 +106,12 @@
        			plus.nativeUI.showWaiting();
        			var web3 = initWeb3();
        			var _self = this;
-       			web3.eth.getBalance(_self.walletAddressReal,function(err,res){
+         		web3.eth.getBalance(_self.walletAddressReal,function(err,res){
        				plus.nativeUI.closeWaiting();
        				if(err){
        					plus.nativeUI.alert('网络异常');
        				}else{
-       					_self.account = res;
+       					_self.account = amountFormat(res/1e18);
        				}
        			});
        		}

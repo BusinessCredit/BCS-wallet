@@ -11,68 +11,103 @@
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-    <title>钱包</title>
+    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
+    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
+    <title>修改密码</title>
 </head>
 <body>
 <div class="setEalletWrapper" id="app">
-    <header class="flex-box header">
-        <img src="img/icon/back_black.png" class="mui-action-back">
-        <div class="box-1 text">修改密码</div>
-        <span class="seize"></span>
-    </header>
     <div class="unContent">
         <div class="content">
             <ul>
                 <li class="flex-box">
                     <span>原始密码</span>
-                    <input class="box-1" type="password" placeholder="请输入原始密码">
+                    <input class="box-1" v-model='old_pwd' type="password" placeholder="请输入原始密码">
                 </li>
                 <li class="flex-box">
                     <span>设置密码</span>
-                    <input class="box-1" type="password" placeholder="请设置新密码">
+                    <input class="box-1" v-model='new_pwd' type="password" placeholder="请设置新密码">
                 </li>
                 <li class="flex-box">
                     <span>重复密码</span>
-                    <input class="box-1" type="password" placeholder="请再次输入密码">
+                    <input class="box-1" v-model='re_pwd' type="password" placeholder="请再次输入密码">
                 </li>
             </ul>
             <div class="swBtn">
-                <a class="btn-ui sw-btn-1">确定</a>
+                <a class="btn-ui sw-btn-1" @tap='doSub'>确定</a>
             </div>
         </div>
     </div>
 </div>
 </body>
 <script type="text/javascript">
-	var immersed = getImmersedHeight();
-	$(".header").css('padding-top', (immersed + 5) + 'px');
     var vm = new Vue({
         el: '#app',
         data: {
+        	old_pwd:'',
+        	new_pwd:'',
+        	re_pwd:'',
         },
         methods: {
-            //获取默认数据
-            getData(){
-                var self = this
-                this.list = []
-                $.ajax({
-                    type: "get",
-                    url: '',
-                    beforeSend: function(xhr) {
-                        token = getItem("Userdata").token;
-                        xhr.setRequestHeader("Authorization", "Basic " + token);
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function(data) {
-                        console.log('系统繁忙!');
-                    }
-                });
-            },
-        },
-        mounted(){
-
+            doSub:function(){
+            	if(!this.old_pwd){
+            		mui.toast('请输入原始密码');return;
+            	}
+            	if(!this.new_pwd){
+            		mui.toast('请设置新密码');return;
+            	}
+            	if(!this.re_pwd){
+            		mui.toast('请确认新密码');return;
+            	}
+            	if(this.new_pwd!=this.re_pwd){
+            		mui.toast('两次密码不同');return;
+            	}
+            	var _self = this;
+            	plus.nativeUI.showWaiting('原始密码验证中');
+				var ks = getItem('walletInfo').ks;
+				var mneKeystore = lightwallet.keystore.deserialize(JSON.stringify(ks));
+				mneKeystore.keyFromPassword(_self.old_pwd, (err, pwDerivedKey) => {
+					if(err){
+						plus.nativeUI.closeWaiting();
+						plus.nativeUI.toast('原始密码验证失败');
+					}else{
+						plus.nativeUI.showWaiting('新密码设置中');
+						var seed = mneKeystore.getSeed(pwDerivedKey);
+						lightwallet.keystore.createVault(
+							{
+								password: _self.new_pwd,
+								seedPhrase: seed,
+								hdPathString: "m/44'/60'/0'/0"
+							},(err, ks) => {
+								_self.createAddress(ks);
+							}
+						);
+					}
+				});
+           },
+           createAddress:function(ks){
+        		var _self = this;
+        		try{
+        			ks.keyFromPassword(_self.new_pwd, function (err, pwDerivedKey) {
+						ks.generateNewAddress(pwDerivedKey, 1);
+						var addresses = ks.getAddresses();
+						var web3 = initWeb3();
+						var keystoreV3 = web3.eth.accounts.privateKeyToAccount('0x' + ks.exportPrivateKey(addresses[0], pwDerivedKey)).encrypt(_self.pwd);;
+						setItem('walletInfo',{
+							walletAddress: addresses[0],
+							keystoreV3: keystoreV3,
+							ks: ks
+						});
+						plus.nativeUI.closeWaiting();
+						plus.nativeUI.alert('密码修改成功',function(){
+							mui.back();
+						});
+		        	});
+        		}catch(e){
+        			plus.nativeUI.closeWaiting();
+        			plus.nativeUI.toast('密码修改失败');
+        		}
+        	}
         }
     })
 </script>

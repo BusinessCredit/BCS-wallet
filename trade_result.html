@@ -11,90 +11,118 @@
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/qrcode.min.js" type="text/javascript" charset="utf-8"></script>
     <title>转账详情</title>
 </head>
 <body>
 <div class="detailsWrapper" id="app">
-    <header class="flex-box header">
-        <img src="img/icon/back_black.png" class="mui-action-back">
-        <div class="box-1 text">转账详情</div>
-        <span class="seize"></span>
-    </header>
     <div class="unContent">
         <div class="succTitle">
             <img src="./img/right-ico-3.png" alt="">
-            <h2>500.89 BCS</h2>
+            <h2>{{num}} BCS</h2>
         </div>
         <div class="content">
             <ul>
                 <li>
                     <h6>发款方</h6>
-                    <p>0x2088668EC11221F5687a7568AAFab291b0B91c6Fa0</p>
+                    <p>{{from}}</p>
                 </li>
                 <li>
                     <h6>收款方</h6>
-                    <p>0x2088668EC11221F5687a7568AAFab291b0B91c6Fa0</p>
+                    <p>{{to}}</p>
                 </li>
                 <li>
                     <h6>矿工费用</h6>
-                    <p>10 BCS</p>
+                    <p>{{gasPrice}} BCS</p>
                 </li>
             </ul>
         </div>
         <div class="content r-content">
             <ul>
                 <li>
-                    <h6>交易号</h6>
-                    <p>0x2088668EC11221</p>
+                    <h6>交易哈希</h6>
+                    <p>{{hash}}</p>
                 </li>
                 <li>
                     <h6>区块</h6>
-                    <p>111111111</p>
+                    <p>{{blockNumber}}</p>
                 </li>
                 <li>
                     <h6>交易时间</h6>
-                    <p>2019.08.23</p>
+                    <p>{{timeStamp}}</p>
                 </li>
             </ul>
             <div class="ewmDesc">
-                <img src="./img/ewm-2.png" alt="">
-                <p>复制URL</p>
+                <div id='qrcode'></div>
+                <p @tap='openBrower'>去查看</p>
             </div>
         </div>
     </div>
 </div>
 </body>
 <script type="text/javascript">
-	var immersed = getImmersedHeight();
-	$(".header").css('padding-top', (immersed + 5) + 'px');
+	mui.plusReady(function(){
+		var self = plus.webview.currentWebview();  
+        self.addEventListener("hide",function (e) {  
+	        window.scrollTo(0, 0);//重置滚动条位置  
+	        vm.clearData();
+    	},false); 
+	});
+	//监听自定义事件，获取交易详情  
+	document.addEventListener('initData', function(event) {
+		var item = event.detail.item;
+		if(!item) {
+			return;
+		}
+		vm.num = amountFormat(item.value/1e18);
+		vm.from = item.from;
+		vm.to = item.to;
+		vm.gasPrice = item.gasPrice/1e9;
+		vm.hash = item.hash;
+		vm.blockNumber = item.blockNumber;
+		vm.timeStamp = formatDate(item.timeStamp);
+		vm.qrcode.makeCode(item.hash)
+	});
     var vm = new Vue({
         el: '#app',
         data: {
-            isOtherList: false
+            num: '',
+            from:'',
+            to:'',
+            gasPrice:'',
+            hash:'',
+            blockNumber:'',
+            timeStamp:'',
+            qrcode:''
+        },
+        mounted:function(){
+        	this.qrcode = new QRCode(document.getElementById("qrcode"), {
+					width : 480,
+					height : 480
+			});
         },
         methods: {
-            //获取默认数据
-            getData(){
-                var self = this
-                this.list = []
-                $.ajax({
-                    type: "get",
-                    url: '',
-                    beforeSend: function(xhr) {
-                        token = getItem("Userdata").token;
-                        xhr.setRequestHeader("Authorization", "Basic " + token);
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function(data) {
-                        console.log('系统繁忙!');
-                    }
-                });
-            },
-        },
-        mounted(){
-
+        	clearData:function(){
+        		this.num = '';
+				this.from = '';
+				this.to = '';
+				this.gasPrice = '';
+				this.hash = '';
+				this.blockNumber = '';
+				this.timeStamp = '';
+				this.qrcode.clear();
+        	},
+            openBrower:function(){
+	           	var _self = this;
+	           	var url = 'https://ropsten.etherscan.io/tx/'+_self.hash;
+				mui.openWindow({
+					url:'browser.html',
+					id:'browser',
+					extras:{
+						url:url
+					}
+				});
+			},
         }
     })
 </script>

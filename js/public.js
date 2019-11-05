@@ -1,4 +1,4 @@
-var rpcaddress = 'http://192.168.10.222:8545';
+var rpcaddress = 'https://ropsten.infura.io';
 
 var initWeb3 = function(){
     return new Web3(new Web3.providers.HttpProvider(rpcaddress));
@@ -8,6 +8,24 @@ var ApiHost = 'http://ub.bcsapi.svkeji.cn';
 UpdataURL = ApiHost+'/version.php';
 NewsList = ApiHost+'/news.php';
 HelpList = ApiHost+'/help.php';
+TradeList = ApiHost+'/trade.php';
+
+//发送交易
+function sendEth(fromAddress, toAddress, amount, password, keystore, gas, gasPrice, callback) {
+    let account = web3.eth.accounts.decrypt(keystore, password),
+        value = web3.utils.toWei(amount, 'ether');
+    web3.eth.accounts.wallet.add(account);
+    web3.eth.sendTransaction({
+        from: fromAddress,
+        to: toAddress,
+        value: value,
+        gasPrice: gasPrice,
+        gas: gas
+    }, function (error, txhash) {
+        callback(error, txhash)
+    });
+};
+//
 
 
 //沉浸式状态栏模式
@@ -40,15 +58,32 @@ function shuffle(arr) {
  * 打开新页面
  * @param {Object} times
  */
-var show=function(name){
-	var web = plus.webview.getWebviewById(name);
-	if(!web){
-		var web=plus.webview.create(name+".html",name);
-	};
-	setTimeout(function(){
-		web.show("fade-in");
-	},300);
-
+var show=function(name,buttons=[],aniShow='slide-in-right'){
+	mui.openWindow({
+	  url: name+'.html',
+	  id: name,
+	  styles: {                           
+	    titleNView: {
+	    	buttons:buttons,
+		  	autoBackButton:true
+	    }
+	  },
+	  show:{
+		  aniShow:aniShow
+	  },
+	  waiting:{
+		  autoShow:false
+	  }
+	});
+};
+var show_without_title=function(name){
+	mui.openWindow({
+	  url: name+'.html',
+	  id: name,
+	  waiting:{
+		  autoShow:false
+	  }
+	});
 };
 var show_with_menu =function(name){
 	var pageObj = plus.webview.getWebviewById(name);
@@ -67,7 +102,22 @@ var show_with_menu =function(name){
 	},300);
 
 };
-
+var amountFormat = function(num){
+	num += '';
+	num = num.replace(/[^0-9|\.]/g, '');
+	if (/^0+/) {
+		num = num.replace(/^0+/, '');
+	}
+	if (!/\./.test(num)) {
+		num += '.00000';
+	}
+	if (/^\./.test(num)) {
+		num = '0' + num;
+	}
+	num += '00000';
+	num = num.match(/\d+\.\d{3}/)[0];
+	return num;
+}
 var restartApp = function() {
 	plus.nativeUI.confirm('请确保钱包已做好备份',function(event){
 		if(event.index==0){
@@ -167,9 +217,8 @@ function formatDate(inputTime) {
 	minute = minute < 10 ? ('0' + minute) : minute;
 	second = second < 10 ? ('0' + second) : second;
 //	console.log(y + '-' + m + '-' + d + ' ' + '　' + h + ':' + minute + ':' + second);
-//	return y + '-' + m + '-' + d + ' ' + '　' + h + ':' + minute + ':' + second;return  h + ':' + minute + ':' + second;
-	return  h + ':' + minute + ':' + second;
-}; 
+	return y + '.' + m + '.' + d +' ' + h + ':' + minute + ':'+second;
+};
 
 function formatDate1(inputTime) { 
 	var date = new Date(parseInt(inputTime*1000));
@@ -185,7 +234,7 @@ function formatDate1(inputTime) {
 	minute = minute < 10 ? ('0' + minute) : minute;
 	second = second < 10 ? ('0' + second) : second;
 //	console.log(y + '-' + m + '-' + d + ' ' + '　' + h + ':' + minute + ':' + second);
-	return y + '-' + m + '-' + d +'　' + h + ':' + minute + ':' + second;
+	return m + '.' + d +' ' + h + ':' + minute;
 };
 
 

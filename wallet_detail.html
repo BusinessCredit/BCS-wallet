@@ -15,15 +15,10 @@
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
 		<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
 		<script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
-		<title>钱包详情</title>
+		<title>钱包管理</title>
 	</head>
 	<body>
 		<div class="wInforWrapper" id="app">
-			<header class="flex-box header">
-				<img src="img/icon/back_black.png" class="mui-action-back">
-				<div class="box-1 text">BCS</div>
-				<span class="seize"></span>
-			</header>
 			<div class="unContent">
 				<div class="wInforTitle">
 					<img src="img/logo-ico-1.png" alt="">
@@ -31,7 +26,7 @@
 				</div>
 				<div class="contentList">
 					<ul>
-						<li class="flex-box" @tap="show('reset_pwd')">
+						<li class="flex-box" v-if='isWords' @tap="show('reset_pwd')">
 							<img src="img/w-i-ico3.png">
 							<p class="box-1">修改密码</p>
 							<i class="right-ico"></i>
@@ -47,7 +42,7 @@
 							<i class="right-ico"></i>
 						</li>
 					</ul>
-					<div class="btnBox">
+					<div class="btnBox" v-if='isWords'>
 						<a class="btn-ui btn-b-1" @tap='wordsExport'>备份助记词</a>
 					</div>
 				</div>
@@ -63,13 +58,18 @@
 				walletAddress:'',
 				walletAddress_real:'',
 				account:'--',
-				keystoreV3:''
+				keystoreV3:'',
+				isWords:false
 			},
-			mounted() {
+			mounted:function() {
 				var walletinfo = getItem('walletInfo');
 				this.keystoreV3 = walletinfo.keystoreV3;
 				this.walletAddress = shortAddress(walletinfo.walletAddress);
 				this.walletAddress_real = walletinfo.walletAddress;
+				var wi = getItem('walletInfo');
+				if(wi.ks){
+					this.isWords = true;
+				}
 			},
 			methods:{
 				wordsExport:function(){
@@ -80,15 +80,19 @@
 							}
 							var ks = getItem('walletInfo').ks;
 							var mneKeystore = lightwallet.keystore.deserialize(JSON.stringify(ks));
-							mneKeystore.keyFromPassword('lxf123456', (err, pwDerivedKey) => {
-								var mnemonic = mneKeystore.getSeed(pwDerivedKey);
-								mui.openWindow({
-									url:'mnemonic_export.html',
-									id:'mnemonic_export',
-									extras:{
-										mnemonic:mnemonic
-									}
-								});
+							mneKeystore.keyFromPassword(e.value, (err, pwDerivedKey) => {
+								if(err){
+									plus.nativeUI.toast('密码有误');
+								}else{
+									var mnemonic = mneKeystore.getSeed(pwDerivedKey);
+									mui.openWindow({
+										url:'mnemonic_export.html',
+										id:'mnemonic_export',
+										extras:{
+											mnemonic:mnemonic
+										}
+									});
+								}
 							});
 						}
 					})
@@ -105,6 +109,7 @@
 							try{
 								var web3 = initWeb3();
 								var account = web3.eth.accounts.decrypt(_self.keystoreV3,e.value);
+								plus.nativeUI.closeWaiting();
 								mui.openWindow({
 									url:'pkey_export.html',
 									id:'pkey_export',

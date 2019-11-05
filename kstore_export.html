@@ -59,11 +59,6 @@
 </head>
 <body>
 <div class="setEalletWrapper importWrapper exportWrapper" id="app">
-    <header class="flex-box header">
-        <img src="img/icon/back_black.png" class="mui-action-back">
-        <div class="box-1 text">导出Keystore</div>
-        <span class="seize"></span>
-    </header>
     <div class="unContent">
         <!--提示-->
         <div class="tipsMask mask" v-if="tips">
@@ -133,8 +128,6 @@
 </div>
 </body>
 <script type="text/javascript">
-	var immersed = getImmersedHeight();
-	$(".header").css('padding-top', (immersed + 5) + 'px');
     var vm = new Vue({
         el: '#app',
         data: {
