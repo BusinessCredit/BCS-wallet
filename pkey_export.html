@@ -11,8 +11,6 @@
 	<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-	<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/qrcode.min.js" type="text/javascript" charset="utf-8"></script>
     <title>导出私钥</title>
     <style type="text/css">
@@ -142,8 +140,8 @@
         methods:{
         	createEwm:function(){
 	    		var qrcode = new QRCode(document.getElementById("qrcode"), {
-					width : 480,
-					height : 480
+					width : 200,
+					height : 200
 				});
 				qrcode.makeCode(this.privateKey)
         	}

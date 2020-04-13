@@ -11,7 +11,6 @@
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
     <title>转账</title>
     <style type="text/css">
     	.mui-input-range .mui-tooltip{
@@ -30,47 +29,49 @@
                 </li>
                 <li class="flex-box">
                     <span>转账金额</span>
-                    <input class="box-1" type="text" v-model="num" placeholder="请输入转账金额">
+                    <input class="box-1" type="number" v-model="num" placeholder="请输入转账金额">
                 </li>
                 <li class="flex-box">
                     <span>钱包密码</span>
                     <input class="box-1" type="password" v-model="pwd" placeholder="请输入钱包密码">
                 </li>
                 <li class="flex-box" style="justify-content: space-between;">
-                    <span>旷工费用</span>
+                    <span>交易费用</span>
 			        <div class="mui-input-row mui-input-range">
 		            	<input type="range" :min='gas_min' v-model="gas_price" :max='gas_max' id='block-range'>
 		        	</div>
-		        	<span>{{tx_fee}} BCS</span>
+		        	<div style="width: 2.2rem;">{{tx_fee}} BCS</div>
                 </li>
             </ul>
             <div class="swBtn" style="margin-top: 1rem;">
-                <a class="btn-ui sw-btn-1" @tap="soSub()">下 一 步</a>
+                <a class="btn-ui sw-btn-1" @tap="soSub">确认转账</a>
             </div>
         </div>
     </div>
 </div>
+<script src="wallet/web3.min.js" type="text/javascript" charset="utf-8"></script>
 </body>
 <script type="text/javascript">
-	var immersed = getImmersedHeight();
-	$(".header").css('padding-top', (immersed + 5) + 'px');
     var vm = new Vue({
         el: '#app',
         data: {
         	address:'',
-        	num:0.1,
+        	num:'',
         	pwd:'',
-        	gas_limit:21000,
-        	gas_price:0,
-        	gas_min:0,
-        	gas_max:0
+        	gas_limit:60000,
+        	gas_price:10,
+        	gas_min:1,
+        	gas_max:30
         },
         computed:{
         	tx_fee:function(){
-        		return parseFloat((this.gas_limit*(this.gas_price/1e9)).toFixed(8))
+        		return parseFloat((this.gas_limit*(this.gas_price)/1e9).toFixed(8))
         	}
         },
         methods: {
+			scanInit:function(res){
+				this.address = res
+			},
            	soSub:function(){
            		if(!this.address){
            			mui.toast('请输入收款地址');return;
@@ -84,41 +85,67 @@
            		var _self = this;
            		var walletInfo = getItem('walletInfo');
            		plus.nativeUI.showWaiting();
-           		var web3 = initWeb3();
-           		var account = web3.eth.accounts.decrypt(walletInfo.keystoreV3, _self.pwd);
-        		var	value = web3.utils.toWei(_self.num.toString(), 'ether');
-			    web3.eth.accounts.wallet.add(account);
-			    web3.eth.sendTransaction({
-			        from: walletInfo.walletAddress,
-			        to: _self.address,
-			        value: value,
-			        gasPrice: _self.gas_price*1e9.toString(),
-			        gas: _self.gas_limit.toString()
-			    }, function (error, txhash) {
+			    try{
+			    	var web3 = initWeb3();
+	           		var account = web3.eth.accounts.decrypt(walletInfo.keystoreV3, _self.pwd);
+	        		var	value = web3.utils.toWei(_self.num.toString(), 'ether');
+				    web3.eth.accounts.wallet.add(account);
+			    	 web3.eth.sendTransaction({
+				        from: walletInfo.walletAddress,
+				        to: _self.address,
+				        value: value,
+				        gasPrice: web3.utils.toWei(_self.gas_price.toString(),'gwei'),
+				        gas: _self.gas_limit.toString()
+				    }, function (error, txhash) {
+				    	plus.nativeUI.closeWaiting();
+				    	if(error){
+				    		mui.alert('转账失败'+error);
+				    		_self.address = '';
+				    		_self.num = '';
+				    		_self.pwd = '';
+				    	}else{
+				    		mui.alert('转账成功，请耐心等待',function(){
+				    			mui.openWindow({
+									url: 'trade_ing.html',
+									id: 'trade_ing',
+									  styles: {                           
+									    titleNView: {
+										  	autoBackButton:true
+									    }
+									},
+									waiting:{
+										  autoShow:false
+									},
+									extras:{
+										addressFrom:walletInfo.walletAddress,
+										addressTo:_self.address,
+										value:value,
+										gas:_self.gas_limit,
+										hash:txhash
+									}
+								});
+								_self.address = '';
+					    		_self.num = '';
+					    		_self.pwd = '';
+								setTimeout(function(){
+									plus.webview.currentWebview().close('none');
+								},1000);
+				    		});
+				    	}
+				    });
+			    }catch(err){
 			    	plus.nativeUI.closeWaiting();
-			    	if(error){
-			    		mui.alert('转账失败');
-			    		_self.address = '';
-			    		_self.num = '';
-			    		_self.pwd = '';
-			    	}else{
-			    		mui.alert('转账请求已提交，请耐心等待');	
-			    	}
-			    });
+			    	mui.alert('转账失败，'+err);	
+			    }
+			   
            	},
            	getGasPrice:function(){
            		var _self = this;
            		var web3 = initWeb3();
            		web3.eth.getGasPrice(function(err,res){
-           			console.log(res);
-           			_self.gas_price = res/1e9;
-           			_self.gas_min = parseInt(res/1e9*0.7);
-           			_self.gas_max = parseInt(res/1e9*1.7);
+           			_self.gas_price = res;
            		});
            	}
-        },
-        mounted:function(){
-       		this.getGasPrice();
         }
     })
 </script>

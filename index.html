@@ -13,28 +13,32 @@
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/util.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/update.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
     <title>钱包</title>
-    <script type="text/javascript">
-		mui.plusReady(function() {
-			//底部菜单
-			BottomMenu();
-			//检测更新
-			update_check();
-			//状态
-			var walletInfo = getItem("walletInfo");
-			if(!getItem("walletInfo")) {
-				var all = plus.webview.all();
-				for(var i = 0; i < all.length; i++) {
-					all[i].hide();
-				};
-				show_without_title('init');
-			}else{
-				vm.initData();
-				plus.navigator.closeSplashscreen();
+    <style type="text/css">
+			.rotation {
+				-webkit-transition-property: -webkit-transform;
+				-webkit-transition-duration: 1s;
+				-moz-transition-property: -moz-transform;
+				-moz-transition-duration: 1s;
+				-webkit-animation: rotate 2s linear infinite;
+				-moz-animation: rotate 2s linear infinite;
+				-o-animation: rotate 2s linear infinite;
+				animation: rotate 2s linear infinite;
 			}
-		});
-	</script>
+			
+			@keyframes rotate {
+				from {
+					transform: rotate(0deg)
+				}
+				to {
+					transform: rotate(1080deg)
+				}
+			}
+			.reload-icon{
+				font-size: 0.4rem;
+				margin-right: 0.2rem;
+			}
+	</style>
 </head>
 <body>
 <div class="indexWrapper footerWrapper" id="app">
@@ -56,7 +60,7 @@
             </div>
         </div>
         <div class="content">
-            <h1 class="title flex-box"><span>我的资产</span></h1>
+            <h1 class="title flex-box"><span>我的资产</span><span @tap="initData" :class="{rotation:dataLoading}" class="mui-icon mui-icon-loop reload-icon"></span></h1>
             <ul>
                 <li class="bcs-b1 flex-box" @tap="show('trade')">
                     <div class="left flex-box">
@@ -71,8 +75,9 @@
         </div>
     </div>
 </div>
+<script src="wallet/web3.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="wallet/lightwallet.min.js" type="text/javascript" charset="utf-8"></script>
 </body>
-
 <script type="text/javascript">
 	var immersed = getImmersedHeight();
 	$(".header").css('padding-top', (immersed + 5) + 'px');
@@ -84,15 +89,36 @@
         	walletAddress:'',
         	walletAddressReal:'',
         	account:0,
-        	bcs2cny:6.2,
-        	isOtherList:false
+        	bcs2cny:0,
+        	isOtherList:false,
+        	dataLoading:false
         },
         computed:{
         	account_cny:function(){
-        		return parseFloat(this.account)*this.bcs2cny;
+        		return (parseFloat(this.account)*this.bcs2cny).toFixed(2);
         	}
         },
+        mounted:function(){
+        	this.getBcs2Cny();
+        },
        	methods:{
+       		getBcs2Cny:function(){
+       			var _self = this;
+       			$.ajax({
+					type:"get",
+					url:BcsPrice,
+					success:function(data){
+						if(data.code) {
+							_self.bcs2cny = data.msg;
+						}else{
+							console.log(data.msg)
+						}
+					},
+					error:function(data){
+						console.log(JSON.stringify(data));
+					} 
+				});	
+       		},
        		initData:function(){
        			var walletinfo = getItem('walletInfo');
 	        	var userinfo = getItem('userInfo');
@@ -103,19 +129,59 @@
 	        	this.getBalance(walletinfo.walletAddress);
        		},
        		getBalance:function(){
-       			plus.nativeUI.showWaiting();
-       			var web3 = initWeb3();
        			var _self = this;
+       			_self.dataLoading = true;
+       			var web3 = initWeb3();
          		web3.eth.getBalance(_self.walletAddressReal,function(err,res){
-       				plus.nativeUI.closeWaiting();
+       				setTimeout(function() {
+						_self.dataLoading = false;
+					}, 500);
        				if(err){
+						console.log(err);
        					plus.nativeUI.alert('网络异常');
        				}else{
        					_self.account = amountFormat(res/1e18);
+       				    _self.setAccountRecord(_self.walletAddressReal,_self.account);
        				}
        			});
+       		},
+       		setAccountRecord:function(address,account){
+       			var self = this;
+                $.ajax({
+                    type: "post",
+                    url: AccountRecord,
+                    data: {
+                    	address:address,
+                        account: account
+                    },
+                    success: function(data){
+                    },
+                    error: function(data) {
+                        console.log(JSON.stringify(data));
+                    }
+                });
        		}
        	}
     })
+</script>
+<script type="text/javascript">
+	mui.plusReady(function() {
+		//底部菜单
+		BottomMenu();
+		//检测更新
+		update_check();
+		//状态
+		var walletInfo = getItem("walletInfo");
+		if(!getItem("walletInfo")) {
+			var all = plus.webview.all();
+			for(var i = 0; i < all.length; i++) {
+				all[i].hide();
+			};
+			show_without_title('init');
+		}else{
+			vm.initData();
+			plus.navigator.closeSplashscreen();
+		}
+	});
 </script>
 </html>

@@ -12,8 +12,6 @@
 		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-		<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
-		<script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
 		<title>恢复身份</title>
 	</head>
 
@@ -51,7 +49,7 @@
 									</li>
 								</ul>
 								<div class="mui-input-row mui-radio mui-left">
-									<label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
+									<label>我已经仔细阅读并同意 <a @tap="show('service')">《服务机隐私条款》</a></label>
 									<input value="1" v-model="checked" type="radio">
 								</div>
 							</div>
@@ -60,7 +58,7 @@
 							<div class="content">
 								<ul>
 									<li>
-										<p class="item2-desc">直接复制粘贴**官方钱包keystore文件内容至输入框， 或者通过生成keystore内容的二维码，扫描录入。
+										<p class="item2-desc">直接复制粘贴官方钱包keystore文件内容至输入框， 或者通过生成keystore内容的二维码，扫描录入。
 										</p>
 										<textarea rows="5" v-model="keystore" placeholder="请输入keystore"></textarea>
 									</li>
@@ -70,7 +68,7 @@
 									</li>
 								</ul>
 								<div class="mui-input-row mui-radio mui-left">
-									<label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
+									<label>我已经仔细阅读并同意 <a @tap="show('service')">《服务机隐私条款》</a></label>
 									<input value="1" v-model="checked" type="radio">
 								</div>
 							</div>
@@ -91,7 +89,7 @@
 									</li>
 								</ul>
 								<div class="mui-input-row mui-radio mui-left">
-									<label>我已经仔细阅读并同意 <a>《服务机隐私条款》</a></label>
+									<label>我已经仔细阅读并同意 <a @tap="show('service')">《服务机隐私条款》</a></label>
 									<input value="1" v-model="checked" type="radio">
 								</div>
 							</div>
@@ -103,9 +101,9 @@
 				</div>
 			</div>
 		</div>
+		<script src="wallet/web3.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="wallet/lightwallet.min.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			var immersed = getImmersedHeight();
-			$(".header").css('padding-top', (immersed + 5) + 'px');
 			var vm = new Vue({
 				el: '#app',
 				data: {
@@ -134,15 +132,6 @@
 								this.privatekey = msg;
 								break;
 						}
-					},
-					scanCode: function() {
-						mui.openWindow({
-							url: 'scan_code.html',
-							id: 'scan_code',
-							extras: {
-								'webid': 'wallet_import'
-							}
-						});
 					},
 					createAddress: function(ks) {
 						var _self = this;
@@ -189,12 +178,12 @@
 									var account = web3.eth.accounts.decrypt(_self.keystore, _self.pwd);
 									setItem('userInfo', {
 										headImg: 'img/defaulthead.png',
-										walletName: 'BCS新钱包',
+										walletName: 'BCS钱包',
 										pwdNotice: ''
 									});
 									setItem('walletInfo', {
 										walletAddress: account.address,
-										keystoreV3: _self.keystore,
+										keystoreV3: JSON.parse(_self.keystore),
 									});
 									plus.nativeUI.closeWaiting();
 									plus.webview.getLaunchWebview().evalJS('vm.initData()');
@@ -213,7 +202,7 @@
 									var keystoreV3 = web3.eth.accounts.encrypt(_self.privatekey, _self.pwd);
 									setItem('userInfo', {
 										headImg: 'img/defaulthead.png',
-										walletName: 'BCS新钱包',
+										walletName: 'BCS钱包',
 										pwdNotice: ''
 									});
 									setItem('walletInfo', {

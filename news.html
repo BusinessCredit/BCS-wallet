@@ -22,12 +22,12 @@
     <div class="unContent">
         <div class="content mescroll" id="mescroll" style="height: 12rem;">
             <ul id='warpId'>
-                <li v-for='item in list'>
+                <li v-for='item in list' @tap='goDetail(item)'>
                     <div class="infor flex-box">
                         <span class="box-1 media_title">{{item.title}}</span>
-                        <b>{{item.date}}</b>
+                        <b>{{item.create_time.substring(5,16)}}</b>
                     </div>
-                    <p>{{item.desc}}</p>
+                    <p>{{item.descr}}</p>
                 </li>
             </ul>
         </div>
@@ -35,15 +35,55 @@
 </div>
 </body>
 <script type="text/javascript">
-	var immersed = getImmersedHeight();
-	$(".header").css('padding-top', (immersed + 5) + 'px');
+	mui.plusReady(function() {
+		vm.page_detail = mui.preload({
+			url: 'article.html',
+			id: 'article_news',
+			styles: {
+				titleNView: {
+				  	autoBackButton:true,
+				  	text:'消息中心'
+	    		},
+				render: "always", //一直渲染  
+				popGesture: "hide"
+			},
+			extras:{
+				page_id:'news'
+			}
+		});
+	});
     var vm = new Vue({
         el: '#app',
         data: {
             mescroll: [],
-            list: []
+            list: [],
+            page_detail:''
         },
         methods: {
+        	goDetail:function(item){
+        		if(item.type==1){
+        			mui.openWindow({
+						url:'browser.html',
+						id:'browser',
+						extras:{
+						   url:item.link
+						},
+						waiting:{
+						   autoShow:false
+					    }
+					});
+        		}else{
+        			var self = this;
+	        		mui.fire(self.page_detail, 'initData', {
+	        			id:item.id,
+	        			title:item.title,
+	        			create_time:item.create_time
+	        		});
+					setTimeout(function() {
+						self.page_detail.show("slide-in-right", 300);;
+					}, 150);
+        		}
+        	},
             initData: function(page) {
                 var self = this;
                 $.ajax({
@@ -52,10 +92,9 @@
                     data: {
                         page: page.num
                     },
-                    dataType: "json",
                     success: function(data){
-                        if(data.status) {
-                            var result = data.result;
+                        if(data.code) {
+                            var result = data.msg;
                             if(page.num == 1) {
                                 self.list = result.list;
                             } else {

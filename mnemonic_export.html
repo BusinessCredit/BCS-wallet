@@ -18,7 +18,7 @@
     <div class="unContent">
         <div class="succTitle">
             <div class="imgBox">
-                <img src="./img/gt-ico1.png" alt="">
+                <img src="img/gt-ico1.png">
             </div>
             <h4>请勿截图</h4>
             <h4>请抄写下你的钱包助记词</h4>
@@ -39,6 +39,11 @@
 </div>
 </body>
 <script type="text/javascript">
+	mui.init({
+		keyEventBind: {
+			backbutton: false  //关闭back按键监听
+		}
+	});
 	mui.plusReady(function(event){
 		var web = plus.webview.currentWebview();
 		vm.mnemonic = web.mnemonic.split(" ");
@@ -54,6 +59,14 @@
         		mui.openWindow({
 					url:'mnemonic_sub.html',
 					id:'mnemonic_sub',
+					styles: {                           
+					    titleNView: {
+						  	autoBackButton:true
+					    }
+					},
+					waiting:{
+						autoShow:false
+					},
 					extras:{
 						mnemonic:_self.mnemonic
 					}

@@ -13,8 +13,6 @@
 		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-		<script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
-		<script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
 		<title>钱包管理</title>
 	</head>
 	<body>
@@ -27,7 +25,7 @@
 				<div class="contentList">
 					<ul>
 						<li class="flex-box" v-if='isWords' @tap="show('reset_pwd')">
-							<img src="img/w-i-ico3.png">
+							<img src="img/w-i-ico2.png">
 							<p class="box-1">修改密码</p>
 							<i class="right-ico"></i>
 						</li>
@@ -49,9 +47,10 @@
 			</div>
 		</div>
 	</body>
+	<script src="wallet/web3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="wallet/lightwallet.min.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript">
-		var immersed = getImmersedHeight();
-		$(".header").css('padding-top', (immersed + 5) + 'px');
+		
 		var vm = new Vue({
 			el: '#app',
 			data: {
@@ -73,14 +72,16 @@
 			},
 			methods:{
 				wordsExport:function(){
-					plus.nativeUI.prompt('输入密码',function(e){
-						if(e.index==0){
+					mui.prompt('','','输入密码',function(e){
+						if(e.index==1){
 							if(!e.value){
 								plus.nativeUI.toast('请输入密码');return;
 							}
+							plus.nativeUI.showWaiting();
 							var ks = getItem('walletInfo').ks;
 							var mneKeystore = lightwallet.keystore.deserialize(JSON.stringify(ks));
 							mneKeystore.keyFromPassword(e.value, (err, pwDerivedKey) => {
+								plus.nativeUI.closeWaiting();
 								if(err){
 									plus.nativeUI.toast('密码有误');
 								}else{
@@ -88,6 +89,14 @@
 									mui.openWindow({
 										url:'mnemonic_export.html',
 										id:'mnemonic_export',
+										styles: {                           
+										    titleNView: {
+											  	autoBackButton:true
+										    }
+										},
+										waiting:{
+											autoShow:false
+										},
 										extras:{
 											mnemonic:mnemonic
 										}
@@ -95,13 +104,13 @@
 								}
 							});
 						}
-					})
-					
+					},'div')
+					document.querySelector('.mui-popup-input input').type='password';
 				},
 				pkeyExport:function(){
 					var _self = this;
-					plus.nativeUI.prompt('输入密码',function(e){
-						if(e.index==0){
+					mui.prompt('','','输入密码',function(e){
+						if(e.index==1){
 							if(!e.value){
 								plus.nativeUI.toast('请输入密码');return;
 							}
@@ -113,23 +122,31 @@
 								mui.openWindow({
 									url:'pkey_export.html',
 									id:'pkey_export',
+									styles: {                           
+									    titleNView: {
+									    	autoBackButton:true
+									    }
+									},
+									waiting:{
+										autoShow:false
+									},
 									extras:{
 										privateKey:account.privateKey
 									}
 								});
 							}catch(e){
-								console.log(JSON.stringify(e));
 								plus.nativeUI.closeWaiting();
 								plus.nativeUI.toast('密码有误');
 							}
 							
 						}
-					})
+					},'div')
+					document.querySelector('.mui-popup-input input').type='password';
 				},
 				kstoreExport:function(){
 					var _self = this;
-					plus.nativeUI.prompt('输入密码',function(e){
-						if(e.index==0){
+					mui.prompt('','','输入密码',function(e){
+						if(e.index==1){
 							if(!e.value){
 								plus.nativeUI.toast('请输入密码');return;
 							}
@@ -145,7 +162,8 @@
 							}
 							
 						}
-					})
+					},'div');
+					document.querySelector('.mui-popup-input input').type='password';
 				}
 			}
 		})

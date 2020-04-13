@@ -37,7 +37,6 @@
 		var web = plus.webview.currentWebview();
 		vm.mnemonic_real = web.mnemonic;
 		vm.mnemonic = shuffle(web.mnemonic);
-		console.log(vm.mnemonic_real);
 	});
     var vm = new Vue({
         el: '#app',
@@ -60,10 +59,13 @@
             	if(this.mnemonic.length>0){
             		return;
             	}
-            	if( JSON.stringify(this.mnemonic_my)== JSON.stringify(this.mnemonic_real)){
-            		plus.webview.getWebviewById('mnemonic_export').close();
+            	if(JSON.stringify(this.mnemonic_my)== JSON.stringify(this.mnemonic_real)){
+            		plus.webview.getWebviewById('mnemonic_export').close('none');
             		plus.nativeUI.alert('助记词顺序正确',function(){
-            			mui.back();
+						setTimeout(function(){
+							plus.webview.getLaunchWebview().show();
+							plus.webview.currentWebview().close('none');
+						},1000);
             		});
             	}else{
             		plus.nativeUI.toast('助记词顺序有误');

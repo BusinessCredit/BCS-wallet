@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>消息中心</title>
+    <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div class="app-content" style="padding:0 0.3rem;" id="app">
+    <h1 style="font-size:0.34rem;font-weight: bold">{{title}}</h1>
+    <h2 style="font-size:0.26rem;color:#999;padding:0.2rem 0;">{{create_time}}</h2>
+    <div class="content" style="font-size:0.28rem" v-html="content"></div>
+    <script type="text/javascript">
+    	mui.plusReady(function(){
+			var self = plus.webview.currentWebview();
+			vm.page_id = self.page_id;
+	        self.addEventListener("hide",function (e) {  
+		        window.scrollTo(0, 0);//重置滚动条位置  
+		        vm.clearData();//重置页面数据  
+	    	},false);
+	    	plus.share.getServices(function(shares) {
+				vm.sharelist = shares;
+			}, function(e) {
+				console.log("获取分享服务列表失败：" + e.message);
+			});
+		});
+    	document.addEventListener('initData',function(event){
+    		vm.title = event.detail.title;
+    		vm.create_time = event.detail.create_time;
+    		vm.getDetail(event.detail.id);
+		});
+    	var vm = new Vue({
+    		el:'#app',
+    		data:{
+    			title:'',
+    			create_time:'',
+    			content:'',
+    			page_id:''
+    		},
+    		methods:{
+    			clearData:function(){
+					this.title='';
+					this.create_time='';
+					this.content=''
+				},
+    			getDetail:function(id){
+    				if(this.page_id=='news'){
+    					var url = NewsDetail;
+    				}else{
+    					var url = HelpDetail;
+    				}
+    				var self = this;
+				    $.ajax({
+						type: "get",
+						url: url,
+						data:{'id':id},
+						success: function(data) {
+							if(data.code) {
+								self.content = data.msg;
+							}else{
+								mui.toast('系统繁忙!');
+							}
+						},
+						error: function(data) {
+							mui.toast('系统繁忙!');
+						}
+					});
+    			}
+    		}
+    	});
+    	
+    </script>
+</div>
+</body>
+</html>

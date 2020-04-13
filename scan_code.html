@@ -8,7 +8,7 @@
 		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-		<title>扫描二维码页面</title>
+		<title>扫描二维码</title>
 		<style type="text/css">
 			body {
 				margin: 0;
@@ -39,15 +39,16 @@
 
 </html>
 <script type="text/javascript">
-	mui.plusReady(function() {
-		var web = plus.webview.currentWebview();
-		vm.scanresult = plus.webview.getWebviewById(web.webid);
+	mui.plusReady(function(){
+		var curr = plus.webview.currentWebview();
+		vm.pre_wedid = curr.pre_webid;
 	});
 	var vm = new Vue({
 		el: '#app',
 		data: {
 			pageW: 0,
 			scanresult: '',
+			pre_wedid:'',
 			headerHtml: [{
 				tag: 'img',
 				id: 'icon_back',
@@ -82,7 +83,7 @@
 			noticeTxt: [{
 				tag: 'font',
 				id: 'notice1',
-				text: '将二维码/条形码放入框内，即可自动扫描',
+				text: '将收款二维码放入框内，即可自动扫描',
 				textStyles: {
 					color: '#ffffff',
 					size: '15px'
@@ -101,39 +102,39 @@
 				var self = this;
 				mui.plusReady(function() {
 					self.startRecognize();
-					var curr = plus.webview.currentWebview();
-					curr.setStyle({
-						'popGesture': 'none'
-					});
-					curr.addEventListener('close', function(e) {
-						self.headerObj.close();
-						self.noticeObj.close();
-					});
-					self.headerObj = new plus.nativeObj.View('header', {
-						top: '0px',
-						right: '0px',
-						height: '100px',
-						width: '100%'
-					}, self.headerHtml);
-					self.noticeObj = new plus.nativeObj.View('notice', {
-						bottom: '120px',
-						right: '0px',
-						height: '100px',
-						width: '100%'
-					}, self.noticeTxt);
-					setTimeout(function() {
-						self.headerObj.show();
-						self.noticeObj.show();
-					}, 500);
-					self.headerObj.addEventListener('click', function(event) {
-						var clientX = event.clientX;
-						var clientY = event.clientY;
-						if(clientX > 0 && clientX <= parseInt(self.pageW * 0.1)) {
-							mui.back();
-						} else if(clientX > self.pageW * 0.80 && clientX <= parseInt(self.pageW)) {
-							self.scanPicture();
-						}
-					});
+					 var curr = plus.webview.currentWebview();
+					 curr.setStyle({
+					 	'popGesture': 'none'
+					 });
+					 curr.addEventListener('close', function(e) {
+					 	self.headerObj.close();
+					 	self.noticeObj.close();
+					 });
+					 self.headerObj = new plus.nativeObj.View('header', {
+					 	top: '0px',
+					 	right: '0px',
+					 	height: '100px',
+					 	width: '100%'
+					 }, self.headerHtml);
+					 self.noticeObj = new plus.nativeObj.View('notice', {
+					 	bottom: '120px',
+					 	right: '0px',
+					 	height: '100px',
+					 	width: '100%'
+					 }, self.noticeTxt);
+					 setTimeout(function() {
+					 	self.headerObj.show();
+					 	self.noticeObj.show();
+					 }, 500);
+					 self.headerObj.addEventListener('click', function(event) {
+					 	var clientX = event.clientX;
+					 	var clientY = event.clientY;
+					 	if(clientX > 0 && clientX <= parseInt(self.pageW * 0.1)) {
+					 		mui.back();
+					 	} else if(clientX > self.pageW * 0.80 && clientX <= parseInt(self.pageW)) {
+					 		self.scanPicture();
+					 	}
+					 });
 				});
 			},
 			showNativeView: function() {
@@ -166,14 +167,8 @@
 				if(type == plus.barcode.QR) {
 					var reg = /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-\?#_\.~\/])+$/;
 					if(reg.test(result)) {
-						var token = getItem("Userdata").token;
-						if(!token) {
-							restartApp();
-						}
-						var url = UpdateUrlParameter(result, 'token', encodeURIComponent(token));
-						plus.runtime.openURL(url, function() {
+						plus.runtime.openURL(result, function() {
 							mui.alert("启动外部浏览器失败");
-							return;
 						});
 						return;
 					} else {
@@ -183,13 +178,15 @@
 					self.showresult(result);
 				} else if(type == plus.barcode.EAN8) {
 					self.showresult(result);
+				}else{
+					plus.nativeUI.alert("无法识别此图片");
+					self.scanObj.close();
+					setTimeout(self.startRecognize, 1000);
 				}
-				self.scanObj.close();
-				setTimeout(self.startRecognize, 1000);
 			},
 			showresult: function(result) {
 				var self = this;
-				self.scanresult.evalJS('vm.scanInit('+JSON.stringify(result)+')');
+				plus.webview.getWebviewById(self.pre_wedid).evalJS('vm.scanInit('+JSON.stringify(result)+')');
 				setTimeout(function() {
 					self.headerObj.hide();
 					self.noticeObj.hide();

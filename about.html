@@ -70,15 +70,14 @@
 						$.ajax({
 							type: "get",
 							url: UpdataURL,
-							dataType: "json", 
 							data: {
 								version: info.version
 							},
-							success: function(item) {
-								if(item.status) {
+							success: function(data) {
+								if(data.code) {
 									_self.is_update = true;
-									_self.version_new = item.version;
-									_self.installdata = item;
+									_self.version_new = data.msg.version_no;
+									_self.installdata = data.msg;
 								}
 							},
 							error: function(data) {

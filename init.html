@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, minimum-scale=1,user-scalable=no">
     <link rel="stylesheet" href="css/mui.min.css">
     <link rel="stylesheet" href="css/unified.css">
     <link rel="stylesheet" href="css/found.css">
@@ -19,10 +19,11 @@
         <div class="content">
             <img class="logo-ico-1" src="img/logo-ico-1.png" alt="">
             <h5 class="found-one">创建您的第一个BCS钱包</h5>
-            <a class="found-btn-1 btn-ui" @tap="show('wallet_create')">创建身份</a>
+            <a class="found-btn-1 btn-ui"  @tap="show('wallet_create')">创建身份</a>
             <a class="found-btn-2 btn-ui" @tap="show('wallet_import',[{
 			  		fontSrc:'_www/fonts/mui-icons-extra.ttf',
-			  		text:'\ue202'
+			  		text:'\ue202',
+					onclick:scan_code
 		  		}])">恢复身份</a>
         </div>
     </div>
@@ -32,8 +33,32 @@
 	mui.plusReady(function(){
 		plus.navigator.closeSplashscreen();
 	});
+	function scan_code(){
+		mui.openWindow({
+		  url: 'scan_code.html',
+		  id: 'scan_code',
+		  waiting:{
+			  autoShow:false
+		  },
+		  extras: {
+				pre_webid:'wallet_import'
+		}
+		});
+	}
     var vm = new Vue({
-        el: '#app'
+        el: '#app',
+        methods:{
+        	aaa:function(){
+          		var url = "wallet_create.html";
+				mui.openWindow({
+					id: url,
+					url: url,
+					waiting: {
+						autoShow: false
+					}
+				});
+        	}
+        }
     })
 </script>
 </html>

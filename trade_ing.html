@@ -18,7 +18,7 @@
 <div class="detailsWrapper" id="app">
     <div class="unContent">
         <div class="succTitle">
-            <img src="./img/right-ico-3.png" alt="">
+            <img src="img/icon_trade.png" alt="">
             <h2>{{num}} BCS</h2>
         </div>
         <div class="content">
@@ -45,11 +45,11 @@
                 </li>
                 <li>
                     <h6>区块</h6>
-                    <p>{{blockNumber}}</p>
+                    <p>---</p>
                 </li>
                 <li>
                     <h6>交易时间</h6>
-                    <p>{{timeStamp}}</p>
+                    <p>---</p>
                 </li>
             </ul>
             <div class="ewmDesc">
@@ -63,25 +63,12 @@
 <script type="text/javascript">
 	mui.plusReady(function(){
 		var self = plus.webview.currentWebview();  
-        self.addEventListener("hide",function (e) {  
-	        window.scrollTo(0, 0);//重置滚动条位置  
-	        vm.clearData();
-    	},false); 
-	});
-	//监听自定义事件，获取交易详情  
-	document.addEventListener('initData', function(event) {
-		var item = event.detail.item;
-		if(!item) {
-			return;
-		}
-		vm.num = amountFormat(item.value/1e18);
-		vm.from = item.addressFrom;
-		vm.to = item.addressTo;
-		vm.gas = item.gas/1e9;
-		vm.hash = item.hash;
-		vm.blockNumber = item.blockNumber;
-		vm.timeStamp = item.timestamp;
-		vm.qrcode.makeCode('https://explorer.bcachain.org/tx/'+item.hash)
+        vm.num = amountFormat(self.value/1e18);
+		vm.from = self.addressFrom;
+		vm.to = self.addressTo;
+		vm.gas = self.gas/1e9;
+		vm.hash = self.hash;
+		vm.qrcode.makeCode('https://explorer.bcachain.org/tx/'+self.hash)
 	});
     var vm = new Vue({
         el: '#app',
@@ -92,7 +79,6 @@
             gas:'',
             hash:'',
             blockNumber:'',
-            timeStamp:'',
             qrcode:''
         },
         mounted:function(){
@@ -102,16 +88,6 @@
 			});
         },
         methods: {
-        	clearData:function(){
-        		this.num = '';
-				this.from = '';
-				this.to = '';
-				this.gas = '';
-				this.hash = '';
-				this.blockNumber = '';
-				this.timeStamp = '';
-				this.qrcode.clear();
-        	},
             openBrower:function(){
 	           	var _self = this;
 	           	var url = 'https://explorer.bcachain.org/tx/'+_self.hash;

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/walletCurr.css">
     <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/rem.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"></script>
+    <script src="js/echarts.min.js"></script>
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
@@ -22,108 +22,215 @@
         <div class="assetsTitle">
             <div id="main" style="width:100%;height:30vh;margin:0 auto;"></div>
         </div>
-        <div class="content">
+        <div class="content" style="background-color: inherit;">
             <h1 class="title">最近交易记录</h1>
-            <div class="mescroll" id="mescroll" style="height: 53vh;">
-            	<ul>
-            		<template v-for='item in list'>
-            			<li class="flex-box" @tap="showDetail(item)" v-if='item.from == address'>
+            <div class="mescroll" id="mescroll">
+            	<ul id="warpId">
+	        		<template v-for='item in list'>
+	        			<li class="flex-box" @tap="showDetail(item)" v-if='item.addressFrom == address'>
 		                    <img src="img/s-a-ico1.png">
 		                    <div class="c-infor box-1">
-		                        <h6>{{shortAddress(item.to)}}</h6>
-		                        <p>{{formatDate1(item.timeStamp)}}</p>
+		                        <h6>{{shortAddress(item.addressTo)}}</h6>
+		                        <p>{{item.timestamp}}</p>
 		                    </div>
 		                    <div class="r-infor plus-c">-{{amountFormat(item.value/1e18)}} BCS</div>
 	                	</li>
 	                	<li class="flex-box" @tap="showDetail(item)" v-else>
 		                    <img src="img/s-a-ico2.png" alt="">
 		                    <div class="c-infor box-1">
-		                        <h6>{{shortAddress(item.from)}}</h6>
-		                        <p>{{formatDate1(item.timeStamp)}}</p>
+		                        <h6>{{shortAddress(item.addressFrom)}}</h6>
+		                        <p>{{item.timestamp}}</p>
 		                    </div>
 		                    <div class="r-infor reduce-c">{{amountFormat(item.value/1e18)}} BCS</div>
 	                	</li>
-            		</template>
+	        		</template>
             	</ul>
             </div>
+           
         </div>
         <div class="assetsFooter flex-box">
-            <a class="box-1 btn-1" @tap="show('trade_out',[{
-			  		fontSrc:'_www/fonts/mui-icons-extra.ttf',
-			  		text:'\ue202'
-		  		}])">转账</a>
+            <a class="box-1 btn-1" @tap="trade_out">转账</a>
             <a class="box-1 btn-2" @tap="show('address_ewm')">收款</a>
         </div>
     </div>
 </div>
 </body>
 <script type="text/javascript">
+	function scan_code(){
+		mui.openWindow({
+		  url: 'scan_code.html',
+		  id: 'scan_code',
+		  waiting:{
+			  autoShow:false
+		  },
+		  extras: {
+				pre_webid:'trade_out'
+		}
+		});
+	}
     var vm = new Vue({
         el: '#app',
         data: {
-            mescroll: [],
 			list: [],
-			address:'0x81b7e08f65bdf5648606c89998a9cc8164397647',
+			address:'',
 			trade_result:''
         },
+        mounted:function(){
+        	this.accountChart();
+        	this.mescroll = this.initMescroll('mescroll', 'warpId');
+        },
         methods: {
-            getTradeList:function(page){
-//				var address = getItem('walletInfo').walletAddress;
-				var address = "0x81b7e08f65bdf5648606c89998a9cc8164397647";
-           		var api = 'http://api-ropsten.etherscan.io/api?module=account&action=txlist&address='+address+'&sort=desc';
-//         		console.log(api);
-           		
+        	accountChart:function(){
+        		this.address = getItem('walletInfo').walletAddress.toLowerCase();
            		var self = this;
 				$.ajax({
 					type: "get",
-					url: TradeList,
-					dataType: "json",
+					url: AccountChart,
+					data:{
+						address:self.address
+					},
 					success: function(data) {
-						if(data.status) {
-							if(page.num == 1) {
-								self.list = data.result;
-							} else {
-								self.list = self.list.concat(data.result);
-							}
-							self.mescroll.endSuccess(data.result.length, data.result.length>=10);
-						}else{
-							self.mescroll.endSuccess(data.result.length, false);
-						}
+						self.initChart(data.msg);
 					},
 					error: function(data) {
 						console.log(JSON.stringify(data));
 					}
 				});
-           },
-			initMescroll: function(mescrollId, warpId) {
-				var self = this;
-				var mescroll = new MeScroll(mescrollId, {
-					up: {
-						callback: function(page) {
-							self.getTradeList(page);
-						},
-						isBounce: false,
-						noMoreSize: 20,
-						empty: {
-							warpId: warpId,
-							icon: "img/icon/none.png",
-							tip: "",
-						},
-						htmlNodata: '<p class="upwarp-nodata">没有更多了哦 ^v^</p>'
+        	},
+        	trade_out:function(){
+          		mui.openWindow({
+				  url: 'trade_out.html',
+				  id: 'trade_out',
+				  styles: {                           
+				    titleNView: {
+				    	buttons:[
+					  	{
+					  		fontSrc:'_www/fonts/mui-icons-extra.ttf',
+					  		text:'\ue202',
+					  		onclick:scan_code
+		  				}
+					  ],
+					  	autoBackButton:true
+				    }
+	  			  },
+				  waiting:{
+					  autoShow:false
+				  },
+				  extras: {
+						pre_webid:'trade'
+				 }
+				});
+        	},
+            getTradeList:function(page){
+            	this.address = getItem('walletInfo').walletAddress.toLowerCase();
+           		var self = this;
+				$.ajax({
+					type: "get",
+					url: TradeRecord,
+					data:{
+						address:self.address
+					},
+					success: function(data) {
+						if(data.code){
+							self.list = data.msg;
+						}else{
+							mui.toast(data.msg)
+						}
+						self.mescroll.endSuccess(self.list.length, false);
+					},
+					error: function(data) {
+						console.log(JSON.stringify(data));
 					}
 				});
-				return mescroll;
-			},
+            },
 			showDetail:function(item){
 				mui.fire(this.trade_result, 'initData', {
 					item: item
 				});
 				this.trade_result.show("slide-in-right", 300);
-			}
-        },
-        mounted:function(){
-        	this.mescroll = this.initMescroll('mescroll', 'warpId');
-        }
+			},
+			initMescroll: function(mescrollId, warpId) {
+                var self = this;
+                var mescroll = new MeScroll(mescrollId, {
+                    up: {
+                        callback: function() {
+                            self.getTradeList();
+                        },
+                        isBounce: false,
+                        empty: {
+                            warpId: warpId,
+                            icon: "img/icon/none.png",
+                            tip: "暂无交易记录",
+                        },
+                        htmlNodata:''
+                    }
+                });
+                return mescroll;
+           },
+           initChart:function(data){
+			   console.log(JSON.stringify(data));
+           	    var myChart = echarts.init(document.getElementById('main'));
+			    var option = {
+			        color: ['#b9d8f2', '#8de6b5'], //环形图每块的颜色
+			        title: {
+			            text: 'Business Credit Substitute',
+			            textStyle:{
+			            	color:'#9C9C9C',
+			            	fontSize:10
+			            },
+			            padding:10
+			        },
+			        tooltip : {
+			            trigger: 'axis',
+			            axisPointer: {
+			                type: 'cross',
+			                label: {
+			                    backgroundColor: '#6a7985'
+			                }
+			            }
+			        },
+			        legend: {
+			            orient: 'vertical',
+			            left: 'right',
+			            data: ['数量','资产'],
+			
+			        },
+			        grid: {
+			            left: '1%',
+			            right: '4%',
+			            bottom: '0%',
+			            containLabel: true
+			        },
+			        xAxis : [
+			            {
+			                type : 'category',
+			                boundaryGap : false,
+			                data : data.key
+			            }
+			        ],
+			        yAxis : [
+			            {
+			                type : 'value'
+			            }
+			        ],
+			        series : [
+			            {
+			                name:'数量',
+			                type:'line',
+			                areaStyle: {normal: {}},
+			                data:data.data
+			            },
+			            {
+			                name:'资产',
+			                type:'line',
+			                areaStyle: {normal: {}},
+			                data:data.money
+			            }
+			        ]
+			    };
+    			myChart.setOption(option);
+           }
+       }
     });
     mui.plusReady(function(){
     	//预加载详情页
@@ -133,84 +240,11 @@
             styles: {
                 titleNView: {
 				  	autoBackButton:true
-    			}
+    			},
+    			render: "always", //一直渲染  
+				popGesture: "hide"
             }
     	});
     })
-</script>
-<script type="text/javascript">
-    // 基于准备好的dom，初始化echarts实例
-    var myChart = echarts.init(document.getElementById('main'));
-
-    // 指定图表的配置项和数据
-    option = {
-        color: ['#b9d8f2', '#8de6b5'], //环形图每块的颜色
-        title: {
-            text: 'Business Credit Substitute',
-            textStyle:{
-            	color:'#9C9C9C',
-            	fontSize:10
-            },
-            padding:10
-        },
-        tooltip : {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross',
-                label: {
-                    backgroundColor: '#6a7985'
-                }
-            }
-        },
-        legend: {
-            orient: 'vertical',
-            left: 'right',
-            data: ['数量','资产'],
-
-        },
-        grid: {
-            left: '1%',
-            right: '4%',
-            bottom: '0%',
-            containLabel: true
-        },
-        xAxis : [
-            {
-                type : 'category',
-                boundaryGap : false,
-                data : ['9/1','9/2','9/3','9/4','9/5','9/6','9/7']
-            }
-        ],
-        yAxis : [
-            {
-                type : 'value'
-            }
-        ],
-        series : [
-            {
-                name:'数量',
-                type:'line',
-                stack: '总量',
-                areaStyle: {normal: {}},
-                data:[320, 332, 301, 334, 390, 330, 320]
-            },
-            {
-                name:'资产',
-                type:'line',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'top'
-                    }
-                },
-                areaStyle: {normal: {}},
-                data:[820, 932, 901, 934, 1290, 1330, 1320]
-            }
-        ]
-    };
-
-    // 使用刚指定的配置项和数据显示图表。
-    myChart.setOption(option);
 </script>
 </html>

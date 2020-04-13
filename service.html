@@ -10,16 +10,36 @@
 		<script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/rem.js"></script>
 		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
 		<title>用户协议</title>
 	</head>
 	<body>
 		<div class="centerWrapper" id="app">
 			<div class="unContent">
-				<div class="content" style="padding: 0.2rem;">
-					用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议用户协议
+				<div class="content" style="padding: 0.2rem;" v-html="content">
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript">
+			var vm = new Vue({
+		        el: '#app',
+		        data: {
+		            content:""
+		        },
+		        mounted:function(){
+		        	var self = this;
+	                $.ajax({
+	                    type: "get",
+	                    url: WalletAgree,
+	                    success: function(data){
+	                        if(data.code) {
+	                           self.content = data.msg;
+	                        }
+	                    }
+	                });
+		        }
+		    })
+		</script>
 	</body>
 </html>

@@ -100,73 +100,7 @@ var util = {
 	updateSubNView: function(currIndex,active) {
 		var self = plus.webview.currentWebview(),
 		nviewEvent = plus.nativeObj.View.getViewById("tabBar"); // 获取nview控件对象
-//		nviewObj = self.getStyle().subNViews[0];// 获取nview对象的属性
-		var nviewObj = {};
-		nviewObj.tags = [{
-							"tag": "img",
-							"id": "walletIcon",
-							"src":"_www/img/tabbar/wallet.png",
-							"src_sel":"_www/img/tabbar/wallet_sub.png",
-							"position": {
-								"top": "5px",
-								"left": "21%",
-								"width": "8%",
-								"height": "55%"
-							}
-						}, {
-							"tag": "font",
-							"id": "indexText",
-							"text": "钱 包",
-							"position": {
-								"top": "30px",
-								"width": "50%",
-								"height": "29px"
-							},
-							"textStyles": {
-								"align": "center",
-								"size": "13px",
-                                "color" : "#A6A39D"
-							}
-						},{
-							"tag": "img",
-							"id": "userIcon",
-							"src":"_www/img/tabbar/user.png",
-							"src_sel":"_www/img/tabbar/user_sub.png",
-							"position": {
-								"top": "5px",
-								"left": "71%",
-								"width": "8%",
-								"height": "55%"
-							}
-						}, {
-							"tag": "font",
-							"id": "starText",
-							"text": "我 的",
-							"position": {
-								"top": "30px",
-								"left": "50%",
-								"width": "50%",
-								"height": "29px"
-							},
-							"textStyles": {
-								"align": "center",
-								"size": "13px",
-                                "color" : "#A6A39D"
-							}
-						},
-						{
-							"tag": "rect",
-							"id": "tabBorder",
-							"position": {
-								"top": "0",
-								"left": "0",
-								"width": "100%",
-								"height": "1px"
-							},
-							"rectStyles": {
-								"color" : "#EEEEEE"
-							}
-						}];
+		nviewObj = self.getStyle().subNViews[0];// 获取nview对象的属性
 		currTag = nviewObj.tags[currIndex]; // 获取当前需重绘的tag
 		if(currIndex%2==0){
 			currTag.src = active?currTag.src_sel:currTag.src;
@@ -177,7 +111,6 @@ var util = {
 		}
 	}
 };
-//var view = null;
 
 function changeView(currIndex) {
 	// 匹配对应tab窗口	
@@ -186,14 +119,11 @@ function changeView(currIndex) {
 	} else {
 		targetPage = plus.webview.currentWebview();
 	}
-	
 	if(targetPage == activePage) {
-		if(currIndex == 0) {
-			if(plus.webview.getTopWebview()!=plus.webview.getLaunchWebview()){
-				plus.webview.hide(plus.webview.getTopWebview())
-			}
-		}
 		return;
+	}
+	if(currIndex==0){
+		vm.initData();
 	}
 	//底部选项卡切换 
 	util.toggleNview(currIndex);

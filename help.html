@@ -24,13 +24,13 @@
 			<div class="unContent">
 				<div class="helpTitle">
 					<h4>我们能帮助你什么？</h4>
-					<input type="text" placeholder="搜索帮助内容">
+					<input type="text" v-model="so" @focusout="doSo" placeholder="搜索帮助内容">
 				</div>
 				<div class="content">
 					<h1>常见问题</h1>
 					<div class="mescroll" id="mescroll" style="height: 12rem;">
 						<ul id='warpId'>
-							<li @tap="openBrower(item.url)" v-for='item in list'>如何找回没有映射的BCS钱包中的BCS代币？</li>
+							<li @tap="goDetail(item)" v-for='item in list'>{{item.title}}</li>
 						</ul>
 					</div>
 
@@ -39,48 +39,85 @@
 		</div>
 	</body>
 	<script type="text/javascript">
+		mui.plusReady(function() {
+			vm.page_detail = mui.preload({
+				url: 'article.html',
+				id: 'article_help',
+				styles: {
+					titleNView: {
+					  	autoBackButton:true,
+					  	text:'帮助中心'
+		    		},
+					render: "always", //一直渲染  
+					popGesture: "hide"
+				},
+				extras:{
+					page_id:'help'
+				}
+			});
+		});
 		var vm = new Vue({
 			el: '#app',
 			data: {
 				mescroll: [],
-				list: []
+				list: [],
+				page_detail:'',
+				so:''
 			},
 			methods: {
-				openBrower:function(url){
-					mui.openWindow({
-						url:'browser.html',
-						id:'browser',
-						extras:{
-							url:url
-						}
-					});
+				doSo:function(){
+					this.mescroll.resetUpScroll(true);
 				},
+				goDetail:function(item){
+	        		if(item.type==1){
+	        			mui.openWindow({
+							url:'browser.html',
+							id:'browser',
+							extras:{
+							   url:item.link
+							},
+							waiting:{
+							   autoShow:false
+						    }
+						});
+	        		}else{
+	        			var self = this;
+		        		mui.fire(self.page_detail, 'initData', {
+		        			id:item.id,
+		        			title:item.title,
+		        			create_time:item.create_time
+		        		});
+						setTimeout(function() {
+							self.page_detail.show("slide-in-right", 300);;
+						}, 150);
+	        		}
+	        	},
 				initData: function(page) {
 					var self = this;
-					$.ajax({
-						type: "get",
-						url: HelpList,
-						data: {
-							page: page.num
-						},
-						dataType: "json",
-						success: function(data) {
-							if(data.status) {
-								var result = data.result;
-								if(page.num == 1) {
-									self.list = result.list;
-								} else {
-									self.list = self.list.concat(result.list);
-								}
-								self.mescroll.endByPage(result.list.length, result.totalPage);
-							} else {
-								self.list = [];
-							}
-						},
-						error: function(data) {
-							console.log(JSON.stringify(data));
-						}
-					});
+	                $.ajax({
+	                    type: "get",
+	                    url: HelpList,
+	                    data: {
+	                        page: page.num,
+	                        so:self.so
+	                    },
+	                    success: function(data){
+	                        if(data.code) {
+	                            var result = data.msg;
+	                            if(page.num == 1) {
+	                                self.list = result.list;
+	                            } else {
+	                                self.list = self.list.concat(result.list);
+	                            }
+	                            self.mescroll.endByPage(result.list.length, result.totalPage);
+	                        } else {
+	                           self.list = [];
+	                        }
+	                    },
+	                    error: function(data) {
+	                        console.log(JSON.stringify(data));
+	                    }
+	                });
 				},
 				initMescroll: function(mescrollId, warpId) {
 					var self = this;

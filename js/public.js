@@ -1,15 +1,20 @@
-var rpcaddress = 'https://ropsten.infura.io';
+var rpcaddress = 'https://web3.bcachain.org';
 
 var initWeb3 = function(){
     return new Web3(new Web3.providers.HttpProvider(rpcaddress));
 }
 //接口
-var ApiHost = 'http://ub.bcsapi.svkeji.cn';
-UpdataURL = ApiHost+'/version.php';
-NewsList = ApiHost+'/news.php';
-HelpList = ApiHost+'/help.php';
-TradeList = ApiHost+'/trade.php';
-
+var ApiHost = 'https://bcs.bcachain.org/api/wallet';
+UpdataURL = ApiHost+'/version';
+BcsPrice = ApiHost+'/bcs_price';
+TradeRecord = ApiHost+'/trade_record';
+NewsList = ApiHost+'/news_list';
+NewsDetail = ApiHost+'/news_detail';
+HelpDetail = ApiHost+'/Help_detail';
+HelpList = ApiHost+'/help_list';
+WalletAgree = ApiHost+'/wallet_agree';
+AccountRecord = ApiHost+'/account_record';
+AccountChart = ApiHost+'/account';
 //发送交易
 function sendEth(fromAddress, toAddress, amount, password, keystore, gas, gasPrice, callback) {
     let account = web3.eth.accounts.decrypt(keystore, password),
@@ -58,7 +63,7 @@ function shuffle(arr) {
  * 打开新页面
  * @param {Object} times
  */
-var show=function(name,buttons=[],aniShow='slide-in-right'){
+var show=function(name,buttons,aniShow='slide-in-right'){
 	mui.openWindow({
 	  url: name+'.html',
 	  id: name,
@@ -67,9 +72,6 @@ var show=function(name,buttons=[],aniShow='slide-in-right'){
 	    	buttons:buttons,
 		  	autoBackButton:true
 	    }
-	  },
-	  show:{
-		  aniShow:aniShow
 	  },
 	  waiting:{
 		  autoShow:false
@@ -236,6 +238,44 @@ function formatDate1(inputTime) {
 //	console.log(y + '-' + m + '-' + d + ' ' + '　' + h + ':' + minute + ':' + second);
 	return m + '.' + d +' ' + h + ':' + minute;
 };
+
+function formatDate16(inputTime) {
+	value = stripscript(inputTime);
+    value = value.replace("0x","");
+	  var arr = value.split("");
+	  arr = arr.reverse();
+	  var len = arr.length;
+	  var res = 0;
+	  $.each(arr, function(i,v){
+	      var num = hex_change(v);
+	    console.log(num)
+	      res += muti16(num, i);
+	  });
+	  inputTime = res
+	var date = new Date(parseInt(inputTime*1000));
+	var y = date.getFullYear();
+	var m = date.getMonth() + 1;
+	m = m < 10 ? ('0' + m) : m;
+	var d = date.getDate();
+	d = d < 10 ? ('0' + d) : d;
+	var h = date.getHours();
+	h = h < 10 ? ('0' + h) : h;
+	var minute = date.getMinutes();
+	var second = date.getSeconds();
+	minute = minute < 10 ? ('0' + minute) : minute;
+	second = second < 10 ? ('0' + second) : second;
+//	console.log(y + '-' + m + '-' + d + ' ' + '　' + h + ':' + minute + ':' + second);
+	return m + '.' + d +' ' + h + ':' + minute;
+};
+
+var stripscript = function(s) {
+    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？↵\r\n]");
+        var rs = "";
+    for (var i = 0; i < s.length; i++) {
+        rs = rs + s.substr(i, 1).replace(pattern, '');
+    }
+    return rs;
+}
 
 
 

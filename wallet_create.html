@@ -2,17 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, minimum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, minimum-scale=1,user-scalable=no">
     <link rel="stylesheet" href="css/mui.min.css">
     <link rel="stylesheet" href="css/unified.css">
     <link rel="stylesheet" href="css/walletCurr.css">
     <script src="js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/rem.js"></script>
-    <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/rem.js"></script>
+	<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/public.js" type="text/javascript" charset="utf-8"></script>
     <title>创建钱包</title>
 </head>
 <body>
@@ -51,11 +49,10 @@
         </div>
     </div>
 </div>
+<script src="wallet/web3.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="wallet/lightwallet.min.js" type="text/javascript" charset="utf-8"></script>
 </body>
-<script src="js/database.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-	var immersed = getImmersedHeight();
-	$(".header").css('padding-top', (immersed + 5) + 'px');
 	var vm = new Vue({
         el: '#app',
         data: {
@@ -66,13 +63,26 @@
 			checked:0
         },
         methods: {
-        	createAddress:function(ks){
+        	createAddress:function(ks,randomSeed){
         		var _self = this;
 		        ks.keyFromPassword(_self.pwd, function (err, pwDerivedKey) {
 					ks.generateNewAddress(pwDerivedKey, 1);
 					var addresses = ks.getAddresses();
 					var web3 = initWeb3();
-					var keystoreV3 = web3.eth.accounts.privateKeyToAccount('0x' + ks.exportPrivateKey(addresses[0], pwDerivedKey)).encrypt(_self.pwd);;
+					var keystoreV3 = web3.eth.accounts.privateKeyToAccount('0x' + ks.exportPrivateKey(addresses[0], pwDerivedKey)).encrypt(_self.pwd);
+					mui.openWindow({
+						url:'mnemonic_export.html',
+						id:'mnemonic_export',
+						styles: {                           
+						    titleNView: {}
+						},
+						waiting:{
+							autoShow:false
+						},
+						extras:{
+							mnemonic:randomSeed
+						}
+					});
 					setItem('userInfo',{
 						headImg:'img/defaulthead.png',
 						walletName:_self.wname,
@@ -85,10 +95,10 @@
 					});
 					plus.nativeUI.closeWaiting();
 					plus.webview.getLaunchWebview().evalJS('vm.initData()');
+					plus.webview.getWebviewById('init').close('none');
 					setTimeout(function(){
-						plus.webview.getLaunchWebview().show();
-						plus.webview.currentWebview().close();
-					},200);
+						plus.webview.currentWebview().close('none');
+					},1000);
 		        });
         	},
             doCreate:function(){
@@ -127,7 +137,7 @@
 						seedPhrase: randomSeed,
 						hdPathString: "m/44'/60'/0'/0"
 					},(err, ks) => {
-						_self.createAddress(ks);
+						_self.createAddress(ks,randomSeed);
 					}
 				);
 				

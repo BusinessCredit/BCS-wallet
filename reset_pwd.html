@@ -11,8 +11,6 @@
     <script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/public.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/web3.js" type="text/javascript" charset="utf-8"></script>
-    <script src="light-wallet/lightwallet.js" type="text/javascript" charset="utf-8"></script>
     <title>修改密码</title>
 </head>
 <body>
@@ -40,6 +38,8 @@
     </div>
 </div>
 </body>
+<script src="wallet/web3.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="wallet/lightwallet.min.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     var vm = new Vue({
         el: '#app',
@@ -65,34 +65,52 @@
             	var _self = this;
             	plus.nativeUI.showWaiting('原始密码验证中');
 				var ks = getItem('walletInfo').ks;
-				var mneKeystore = lightwallet.keystore.deserialize(JSON.stringify(ks));
-				mneKeystore.keyFromPassword(_self.old_pwd, (err, pwDerivedKey) => {
-					if(err){
+				try{
+					var mneKeystore = lightwallet.keystore.deserialize(JSON.stringify(ks));
+					mneKeystore.keyFromPassword(_self.old_pwd, (err, pwDerivedKey) => {
 						plus.nativeUI.closeWaiting();
-						plus.nativeUI.toast('原始密码验证失败');
-					}else{
-						plus.nativeUI.showWaiting('新密码设置中');
-						var seed = mneKeystore.getSeed(pwDerivedKey);
-						lightwallet.keystore.createVault(
-							{
-								password: _self.new_pwd,
-								seedPhrase: seed,
-								hdPathString: "m/44'/60'/0'/0"
-							},(err, ks) => {
-								_self.createAddress(ks);
+						if(err){
+							plus.nativeUI.toast('原始密码验证失败');
+						}else{
+							plus.nativeUI.showWaiting('新密码设置中');
+							try{
+								var seed = mneKeystore.getSeed(pwDerivedKey);
+							}catch(err){
+								plus.nativeUI.closeWaiting();
+								plus.nativeUI.toast('原始密码验证失败');
+								return;
 							}
-						);
-					}
-				});
+							lightwallet.keystore.createVault(
+								{
+									password: _self.new_pwd,
+									seedPhrase: seed,
+									hdPathString: "m/44'/60'/0'/0"
+								},(err, ks) => {
+									plus.nativeUI.closeWaiting();
+									if(err){
+										plus.nativeUI.toast('密码设置失败');
+									}else{
+										_self.createAddress(ks);
+									}
+								}
+							);
+						}
+					});
+				}catch(err){
+					plus.nativeUI.closeWaiting();
+					plus.nativeUI.toast('原始密码验证失败');
+				}
            },
            createAddress:function(ks){
+           	    
         		var _self = this;
         		try{
         			ks.keyFromPassword(_self.new_pwd, function (err, pwDerivedKey) {
 						ks.generateNewAddress(pwDerivedKey, 1);
 						var addresses = ks.getAddresses();
+						var pkey = '0x' + ks.exportPrivateKey(addresses[0], pwDerivedKey);
 						var web3 = initWeb3();
-						var keystoreV3 = web3.eth.accounts.privateKeyToAccount('0x' + ks.exportPrivateKey(addresses[0], pwDerivedKey)).encrypt(_self.pwd);;
+						var keystoreV3 = web3.eth.accounts.privateKeyToAccount(pkey).encrypt(_self.new_pwd);
 						setItem('walletInfo',{
 							walletAddress: addresses[0],
 							keystoreV3: keystoreV3,
@@ -105,7 +123,7 @@
 		        	});
         		}catch(e){
         			plus.nativeUI.closeWaiting();
-        			plus.nativeUI.toast('密码修改失败');
+        			plus.nativeUI.toast('密码设置失败');
         		}
         	}
         }

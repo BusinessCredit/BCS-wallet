@@ -1,10 +1,11 @@
 var install = function (item) {
 	plus.nativeUI.showWaiting("更新中,请稍后");
-	var url=item.Android;
-	if (plus.os.name.toLowerCase() == "ios") {
+	if (plus.os.name.toLowerCase() == "dlink_ios") {
 		var url = item.IOS;
+	}else{
+		var url = item.dlink_android;
 	}
-	if (item.need_install) {
+	if (item.is_install) {
 		plus.runtime.openURL(url, function () {
 			mui.toast("启动外部浏览器错误");
 		});
@@ -41,13 +42,13 @@ var update_check = function() {
 			data:{
 				version:info.version,
 			},
-			dataType: "json", 
-			success:function(item){
-				if(item.status) {
-					if (!item.must_install) {
+			success:function(data){
+				if(data.code) {
+					var item = data.msg;
+					if (!item.is_must) {
 						return false;
 					}
-					plus.nativeUI.confirm(item.tip, function (ev) {
+					plus.nativeUI.confirm(item.descr, function (ev) {
 						if (ev.index == 0) {
 							install(item);
 						}
